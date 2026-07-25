@@ -5,8 +5,8 @@ import { DebugContext } from './context'
 
 const PRESET_LABELS: Record<DelayPreset, string> = {
   instant: 'Instant (300ms)',
-  normal:  'Normal (1.5s)',
-  slow:    'Slow (3s)',
+  normal: 'Normal (1.5s)',
+  slow: 'Slow (3s)',
 }
 
 export function DebugToolbar() {
@@ -19,7 +19,7 @@ export function DebugToolbar() {
       <span className="font-medium text-gray-400 uppercase tracking-wide">Debug</span>
       <div className="flex items-center gap-2">
         <span>Delay:</span>
-        {(Object.keys(DELAY_PRESETS) as DelayPreset[]).map(preset => (
+        {(Object.keys(DELAY_PRESETS) as DelayPreset[]).map((preset) => (
           <button
             key={preset}
             onClick={() => setDelayPreset(preset)}
@@ -33,7 +33,7 @@ export function DebugToolbar() {
         <input
           type="checkbox"
           checked={failNext}
-          onChange={e => setFailNext(e.target.checked)}
+          onChange={(e) => setFailNext(e.target.checked)}
           className="h-3 w-3"
         />
         Fail next request

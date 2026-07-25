@@ -2,8 +2,8 @@
 // while keeping the literal types (e.g. 300, not number) for display.
 export const DELAY_PRESETS = {
   instant: 300,
-  normal:  1500,
-  slow:    3000,
+  normal: 1500,
+  slow: 3000,
 } satisfies Record<string, number>
 
 export type DelayPreset = keyof typeof DELAY_PRESETS

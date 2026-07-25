@@ -1,37 +1,33 @@
-import { Suspense, startTransition, useState } from "react";
-import { ErrorBoundary } from "react-error-boundary";
-import { Toaster } from "sonner";
-import { DebugContext } from "./debug/context";
-import { DELAY_PRESETS } from "./debug/config";
-import type { DelayPreset } from "./debug/config";
-import { fetchTodos } from "./todos/store";
-import type { TodosPromise } from "./todos/store";
-import { DebugToolbar } from "./debug/DebugToolbar";
-import { TodoList } from "./todos/TodoList";
+import { Suspense, startTransition, useState } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
+import { Toaster } from 'sonner'
+import { DebugContext } from './debug/context'
+import { DELAY_PRESETS } from './debug/config'
+import type { DelayPreset } from './debug/config'
+import { fetchTodos } from './todos/store'
+import type { TodosPromise } from './todos/store'
+import { DebugToolbar } from './debug/DebugToolbar'
+import { TodoList } from './todos/TodoList'
 
 export default function App() {
-  const [todosPromise, setTodosPromise] = useState<TodosPromise>(() =>
-    fetchTodos(),
-  );
-  const [delayPreset, setDelayPreset] = useState<DelayPreset>("instant");
-  const [failNext, setFailNext] = useState(false);
+  const [todosPromise, setTodosPromise] = useState<TodosPromise>(() => fetchTodos())
+  const [delayPreset, setDelayPreset] = useState<DelayPreset>('instant')
+  const [failNext, setFailNext] = useState(false)
 
-  const refresh = () => startTransition(() => setTodosPromise(fetchTodos(DELAY_PRESETS[delayPreset])));
+  const refresh = () =>
+    startTransition(() => setTodosPromise(fetchTodos(DELAY_PRESETS[delayPreset])))
 
   // React 19: <Context value={...}> replaces <Context.Provider value={...}>.
   // The .Provider form still works but is no longer necessary.
   return (
-    <DebugContext
-      value={{ delayPreset, failNext, setDelayPreset, setFailNext }}
-    >
+    <DebugContext value={{ delayPreset, failNext, setDelayPreset, setFailNext }}>
       <main className="mx-auto max-w-xl p-8 pb-16">
         <h1 className="text-2xl font-semibold">Todos</h1>
         <p>Playground for trying out modern React and TypeScript idioms.</p>
         <ErrorBoundary
           fallbackRender={({ error }) => (
             <p className="mt-4 text-red-600">
-              Failed to load todos:{" "}
-              {error instanceof Error ? error.message : String(error)}
+              Failed to load todos: {error instanceof Error ? error.message : String(error)}
             </p>
           )}
         >
@@ -45,13 +41,13 @@ export default function App() {
         position="bottom-right"
         toastOptions={{
           style: {
-            width: "fit-content",
-            minWidth: "unset",
-            animation: "none",
-            transition: "none",
+            width: 'fit-content',
+            minWidth: 'unset',
+            animation: 'none',
+            transition: 'none',
           },
         }}
       />
     </DebugContext>
-  );
+  )
 }

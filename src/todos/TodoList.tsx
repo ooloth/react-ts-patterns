@@ -75,13 +75,13 @@ export function TodoList({ todosPromise, onMutate }: Props) {
       <input
         type="search"
         value={query}
-        onChange={e => setQuery(e.target.value)}
+        onChange={(e) => setQuery(e.target.value)}
         placeholder="Filter todos…"
         className="mt-6 w-full rounded border border-gray-300 px-3 py-2 text-sm"
       />
       <AddTodoForm ref={inputRef} onAdd={handleAdd} onMutate={onMutate} />
       <ul className={`mt-4 divide-y divide-gray-200 ${isPending ? 'opacity-50' : ''}`}>
-        {visible.map(todo => (
+        {visible.map((todo) => (
           <li key={todo.id} className="flex items-center gap-3 py-3">
             <input
               type="checkbox"
@@ -89,7 +89,9 @@ export function TodoList({ todosPromise, onMutate }: Props) {
               onChange={() => handleToggle(todo.id)}
               className="h-4 w-4 cursor-pointer"
             />
-            <span className={`flex-1 ${todo.status === 'completed' ? 'line-through text-gray-400' : ''}`}>
+            <span
+              className={`flex-1 ${todo.status === 'completed' ? 'line-through text-gray-400' : ''}`}
+            >
               {todo.title}
             </span>
             <button

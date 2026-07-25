@@ -1,5 +1,6 @@
 import js from '@eslint/js'
 import globals from 'globals'
+import prettier from 'eslint-config-prettier'
 import reactCompiler from 'eslint-plugin-react-compiler'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
@@ -19,6 +20,7 @@ export default defineConfig([
       reactRefresh.configs.vite,
       reactX.configs['recommended-typescript'],
       reactDom.configs.recommended,
+      prettier,
     ],
     plugins: {
       'react-compiler': reactCompiler,

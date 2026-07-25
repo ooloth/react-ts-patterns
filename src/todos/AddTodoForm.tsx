@@ -35,29 +35,26 @@ export function AddTodoForm({ ref, onAdd, onMutate }: Props) {
   const [title, setTitle] = useState('')
   const { mutationOptions, setFailNext } = useMutationOptions()
 
-  const [, formAction] = useActionState(
-    async (_prev: null, formData: FormData): Promise<null> => {
-      const todo: Todo = {
-        id: TodoIdSchema.parse(crypto.randomUUID()),
-        title: (formData.get('title') as string).trim(),
-        status: 'active',
-        createdAt: new Date().toISOString(),
-      }
+  const [, formAction] = useActionState(async (_prev: null, formData: FormData): Promise<null> => {
+    const todo: Todo = {
+      id: TodoIdSchema.parse(crypto.randomUUID()),
+      title: (formData.get('title') as string).trim(),
+      status: 'active',
+      createdAt: new Date().toISOString(),
+    }
 
-      onAdd(todo)
-      toast.loading('Adding…', { id: 'todo-add' })
-      try {
-        await addTodo(todo, mutationOptions)
-        toast.dismiss('todo-add')
-        onMutate()
-      } catch {
-        toast.error('Failed to add — item removed', { id: 'todo-add' })
-        setFailNext(false)
-      }
-      return null
-    },
-    null,
-  )
+    onAdd(todo)
+    toast.loading('Adding…', { id: 'todo-add' })
+    try {
+      await addTodo(todo, mutationOptions)
+      toast.dismiss('todo-add')
+      onMutate()
+    } catch {
+      toast.error('Failed to add — item removed', { id: 'todo-add' })
+      setFailNext(false)
+    }
+    return null
+  }, null)
 
   return (
     // onSubmit fires synchronously on submit; action runs async after.
@@ -68,7 +65,7 @@ export function AddTodoForm({ ref, onAdd, onMutate }: Props) {
         name="title"
         type="text"
         value={title}
-        onChange={e => setTitle(e.target.value)}
+        onChange={(e) => setTitle(e.target.value)}
         placeholder="New todo…"
         className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm"
       />
