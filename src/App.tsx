@@ -9,7 +9,7 @@ import { TodoList } from './ui/TodoList'
 
 export default function App() {
   const [todosPromise, setTodosPromise] = useState(() => fetchTodos())
-  const [delayPreset, setDelayPreset] = useState<DelayPreset>('normal')
+  const [delayPreset, setDelayPreset] = useState<DelayPreset>('instant')
   const [failNext, setFailNext] = useState(false)
 
   const refresh = () => startTransition(() => setTodosPromise(fetchTodos()))

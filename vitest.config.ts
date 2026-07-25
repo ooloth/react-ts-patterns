@@ -4,5 +4,6 @@ import viteConfig from './vite.config'
 export default mergeConfig(viteConfig, defineConfig({
   test: {
     environment: 'node',
+    exclude: ['e2e/**', 'node_modules/**'],
   },
 }))
