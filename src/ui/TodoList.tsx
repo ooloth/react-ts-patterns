@@ -71,11 +71,15 @@ export function TodoList({ todosPromise, onMutate }: Props) {
       <ul className="mt-4 divide-y divide-gray-200">
         {optimisticTodos.map(todo => (
           <li key={todo.id} className="flex items-center gap-3 py-3">
-            <button onClick={() => handleToggle(todo.id)} className="flex-1 text-left">
-              <span className={todo.status === 'completed' ? 'line-through text-gray-400' : ''}>
-                {todo.title}
-              </span>
-            </button>
+            <input
+              type="checkbox"
+              checked={todo.status === 'completed'}
+              onChange={() => handleToggle(todo.id)}
+              className="h-4 w-4 cursor-pointer"
+            />
+            <span className={`flex-1 ${todo.status === 'completed' ? 'line-through text-gray-400' : ''}`}>
+              {todo.title}
+            </span>
             <button
               onClick={() => handleDelete(todo.id)}
               className="text-sm text-red-500 hover:text-red-700"
