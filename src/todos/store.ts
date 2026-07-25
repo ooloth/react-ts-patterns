@@ -1,7 +1,8 @@
-import { DELAY_PRESETS } from '../domain/debug'
-import { TodoIdSchema } from '../domain/schema'
-import type { RawTodo, Todo, TodoId } from '../domain/schema'
-import { toggleStatus } from '../domain/todos'
+import { DEFAULT_MUTATION_OPTIONS, DELAY_PRESETS } from '../debug/config'
+import type { MutationOptions } from '../debug/config'
+import { TodoIdSchema } from './schema'
+import type { RawTodo, Todo, TodoId } from './schema'
+import { toggleStatus } from './state-transitions'
 
 const delay = (ms: number, signal?: AbortSignal) =>
   new Promise<void>((resolve, reject) => {
@@ -19,16 +20,6 @@ let store: Todo[] = [
   { id: TodoIdSchema.parse('2'), title: 'Build this todo app', status: 'active', createdAt: '2026-07-25T09:01:00.000Z' },
   { id: TodoIdSchema.parse('3'), title: 'Review TypeScript utility types', status: 'completed', createdAt: '2026-07-25T09:02:00.000Z' },
 ]
-
-export type MutationOptions = {
-  delayMs: number
-  shouldFail: boolean
-}
-
-const DEFAULT_MUTATION_OPTIONS: MutationOptions = {
-  delayMs: DELAY_PRESETS.normal,
-  shouldFail: false,
-}
 
 // ReturnType<> derives a type from a function's return type rather than
 // writing it by hand — if fetchTodos ever changes, TodosPromise updates too.

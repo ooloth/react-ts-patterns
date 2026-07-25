@@ -1,6 +1,7 @@
 import { use } from 'react'
-import { DELAY_PRESETS, DebugContext } from '../domain/debug'
-import type { DelayPreset } from '../domain/debug'
+import { DELAY_PRESETS } from './config'
+import type { DelayPreset } from './config'
+import { DebugContext } from './context'
 
 const PRESET_LABELS: Record<DelayPreset, string> = {
   instant: 'Instant (300ms)',

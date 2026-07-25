@@ -1,12 +1,13 @@
 import { Suspense, startTransition, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Toaster } from "sonner";
-import { DebugContext, DELAY_PRESETS } from "./domain/debug";
-import type { DelayPreset } from "./domain/debug";
-import { fetchTodos } from "./api/todos";
-import type { TodosPromise } from "./api/todos";
-import { DebugToolbar } from "./ui/DebugToolbar";
-import { TodoList } from "./ui/TodoList";
+import { DebugContext } from "./debug/context";
+import { DELAY_PRESETS } from "./debug/config";
+import type { DelayPreset } from "./debug/config";
+import { fetchTodos } from "./todos/store";
+import type { TodosPromise } from "./todos/store";
+import { DebugToolbar } from "./debug/DebugToolbar";
+import { TodoList } from "./todos/TodoList";
 
 export default function App() {
   const [todosPromise, setTodosPromise] = useState<TodosPromise>(() =>

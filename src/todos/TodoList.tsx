@@ -1,11 +1,13 @@
 import { startTransition, use, useDeferredValue, useOptimistic, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { deleteTodo, toggleTodo } from '../api/todos'
-import type { TodosPromise } from '../api/todos'
-import { applyOptimistic, parseTodo } from '../domain/todos'
-import type { Todo, TodoId } from '../domain/schema'
+import { deleteTodo, toggleTodo } from './store'
+import type { TodosPromise } from './store'
+import { applyOptimistic } from './state-transitions'
+import { parseTodo } from './parse'
+import { filterTodos } from './filter'
+import type { Todo, TodoId } from './schema'
 import { AddTodoForm } from './AddTodoForm'
-import { useMutationOptions } from './useMutationOptions'
+import { useMutationOptions } from '../debug/useMutationOptions'
 
 type Props = {
   todosPromise: TodosPromise
@@ -23,9 +25,7 @@ export function TodoList({ todosPromise, onMutate }: Props) {
   // the filtered-list re-render when it can't keep up with fast typing.
   const deferredQuery = useDeferredValue(query)
   const isPending = query !== deferredQuery
-  const visible = optimisticTodos.filter(t =>
-    t.title.toLowerCase().includes(deferredQuery.toLowerCase())
-  )
+  const visible = filterTodos(optimisticTodos, deferredQuery)
 
   const handleAdd = (todo: Todo) => {
     addOptimistic({ type: 'add', todo })

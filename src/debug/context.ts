@@ -1,14 +1,5 @@
 import { createContext } from 'react'
-
-// satisfies ensures the values are all numbers and the keys form a closed set,
-// while keeping the literal types (e.g. 300, not number) for display.
-export const DELAY_PRESETS = {
-  instant: 300,
-  normal: 1500,
-  slow:   3000,
-} satisfies Record<string, number>
-
-export type DelayPreset = keyof typeof DELAY_PRESETS
+import type { DelayPreset } from './config'
 
 export type DebugSettings = {
   delayPreset: DelayPreset

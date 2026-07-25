@@ -1,11 +1,11 @@
 import { useActionState, useState } from 'react'
+import { useFormStatus } from 'react-dom'
 import type { Ref } from 'react'
 import { toast } from 'sonner'
-import { addTodo } from '../api/todos'
-import { TodoIdSchema } from '../domain/schema'
-import type { Todo } from '../domain/schema'
-import { SubmitButton } from './SubmitButton'
-import { useMutationOptions } from './useMutationOptions'
+import { addTodo } from './store'
+import { TodoIdSchema } from './schema'
+import type { Todo } from './schema'
+import { useMutationOptions } from '../debug/useMutationOptions'
 
 type Props = {
   // React 19: ref is a plain prop — no forwardRef wrapper needed.
@@ -13,6 +13,22 @@ type Props = {
   ref?: Ref<HTMLInputElement>
   onAdd: (todo: Todo) => void
   onMutate: () => void
+}
+
+// useFormStatus must be called in a descendant of the <form>, not the same
+// component that renders it — React reads form context from the nearest
+// ancestor <form>.
+function SubmitButton({ label, disabled = false }: { label: string; disabled?: boolean }) {
+  const { pending } = useFormStatus()
+  return (
+    <button
+      type="submit"
+      disabled={pending || disabled}
+      className="rounded bg-blue-600 px-4 py-2 text-sm text-white disabled:opacity-50"
+    >
+      {label}
+    </button>
+  )
 }
 
 export function AddTodoForm({ ref, onAdd, onMutate }: Props) {

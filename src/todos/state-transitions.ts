@@ -1,5 +1,4 @@
-import { TodoSchema } from './schema'
-import type { RawTodo, Todo, TodoId, TodoStatus } from './schema'
+import type { Todo, TodoId, TodoStatus } from './schema'
 
 export type OptimisticAction =
   | { type: 'add'; todo: Todo }
@@ -19,10 +18,4 @@ export function applyOptimistic(todos: Todo[], action: OptimisticAction): Todo[]
     case 'delete':
       return todos.filter(t => t.id !== action.id)
   }
-}
-
-// Parses an unknown value into a typed Todo. Throws on invalid shape.
-// Called at the API boundary after every fetch or mutation response.
-export function parseTodo(raw: RawTodo): Todo {
-  return TodoSchema.parse(raw)
 }
