@@ -1,13 +1,14 @@
 import { startTransition, use, useOptimistic } from 'react'
 import { toast } from 'sonner'
 import { deleteTodo, toggleTodo } from '../api/todos'
+import type { TodosPromise } from '../api/todos'
 import { applyOptimistic, parseTodo } from '../domain/todos'
-import type { RawTodo, Todo, TodoId } from '../domain/schema'
+import type { Todo, TodoId } from '../domain/schema'
 import { AddTodoForm } from './AddTodoForm'
 import { useMutationOptions } from './useMutationOptions'
 
 type Props = {
-  todosPromise: Promise<RawTodo[]>
+  todosPromise: TodosPromise
   onMutate: () => void
 }
 

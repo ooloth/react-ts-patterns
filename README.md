@@ -9,7 +9,9 @@ and how the React Compiler changes the memoization conversation.
 
 ```bash
 npm install
-npm run dev
+npm run dev        # start dev server
+npm test           # Vitest unit tests (pure domain functions)
+npm run test:e2e   # Playwright e2e tests (full app in Chromium)
 ```
 
 ## Structure
@@ -61,10 +63,11 @@ Dependency direction: `domain` ← `api` ← `ui`. Nothing in `domain/` imports 
 | `z.infer<>` | All types (`Todo`, `TodoId`, `TodoStatus`, etc.) are derived from Zod schemas — never written by hand |
 | Branded types | `TodoId = z.string().brand<'TodoId'>()` — the type system rejects a plain `string` where a validated ID is required |
 | `satisfies` | `DELAY_PRESETS satisfies Record<string, number>` preserves the literal key types (`'instant' \| 'normal' \| 'slow'`) while enforcing the value shape; also used in `toggleTodo` to assert the spread object still satisfies `Todo` |
-| Discriminated unions | `OptimisticAction` (`add` / `toggle` / `delete`), `ActionState` (`idle` / `error`), and `RemoteData<T>` (`idle` / `loading` / `success` / `error`) each exhaustively switch on `type` / `status` |
+| Discriminated unions | `OptimisticAction` (`add` / `toggle` / `delete`) and `RemoteData<T>` (`idle` / `loading` / `success` / `error`) each exhaustively switch on `type` / `status` |
 | `Readonly<>` | `Todo` is `Readonly<z.infer<typeof TodoSchema>>` — mutations must replace the object, never mutate it in place |
 | `z.enum()` | `TodoStatus` is derived from a Zod enum so the schema and the type stay in sync |
 | `TodoSchema.omit()` | `CreateTodoInput` is derived structurally — no manual duplication of fields |
+| `ReturnType<>` | `TodosPromise = ReturnType<typeof fetchTodos>` — the prop and state types stay in sync with the function signature automatically |
 
 ## Design notes
 

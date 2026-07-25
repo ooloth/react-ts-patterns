@@ -1,4 +1,4 @@
-import { useActionState } from 'react'
+import { useActionState, useState } from 'react'
 import { toast } from 'sonner'
 import { addTodo } from '../api/todos'
 import { TodoIdSchema } from '../domain/schema'
@@ -11,23 +11,15 @@ type Props = {
   onMutate: () => void
 }
 
-type ActionState =
-  | { status: 'idle' }
-  | { status: 'error'; message: string }
-
 export function AddTodoForm({ onAdd, onMutate }: Props) {
+  const [title, setTitle] = useState('')
   const { mutationOptions, setFailNext } = useMutationOptions()
 
-  const [state, formAction] = useActionState(
-    async (_prev: ActionState, formData: FormData): Promise<ActionState> => {
-      const title = formData.get('title')
-      if (typeof title !== 'string' || title.trim() === '') {
-        return { status: 'error', message: 'Title is required' }
-      }
-
+  const [, formAction] = useActionState(
+    async (_prev: null, formData: FormData): Promise<null> => {
       const todo: Todo = {
         id: TodoIdSchema.parse(crypto.randomUUID()),
-        title: title.trim(),
+        title: (formData.get('title') as string).trim(),
         status: 'active',
         createdAt: new Date().toISOString(),
       }
@@ -42,24 +34,24 @@ export function AddTodoForm({ onAdd, onMutate }: Props) {
         toast.error('Failed to add — item removed', { id: toastId })
         setFailNext(false)
       }
-      return { status: 'idle' }
+      return null
     },
-    { status: 'idle' },
+    null,
   )
 
   return (
-    <form action={formAction} className="mt-6 flex gap-2">
+    // onSubmit fires synchronously on submit; action runs async after.
+    // Clearing title here gives optimistic input reset before the await.
+    <form action={formAction} onSubmit={() => setTitle('')} className="mt-6 flex gap-2">
       <input
         name="title"
         type="text"
+        value={title}
+        onChange={e => setTitle(e.target.value)}
         placeholder="New todo…"
-        required
         className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm"
       />
-      <SubmitButton label="Add" />
-      {state.status === 'error' && (
-        <p className="mt-1 text-sm text-red-600">{state.message}</p>
-      )}
+      <SubmitButton label="Add" disabled={title.trim() === ''} />
     </form>
   )
 }

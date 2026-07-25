@@ -23,6 +23,10 @@ const DEFAULT_MUTATION_OPTIONS: MutationOptions = {
   shouldFail: false,
 }
 
+// ReturnType<> derives a type from a function's return type rather than
+// writing it by hand — if fetchTodos ever changes, TodosPromise updates too.
+export type TodosPromise = ReturnType<typeof fetchTodos>
+
 // Returns unknown[] — callers must parse before trusting the shape.
 export async function fetchTodos(): Promise<RawTodo[]> {
   await delay(DELAY_PRESETS.normal)

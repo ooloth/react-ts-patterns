@@ -13,6 +13,27 @@ test('page loads with seed todos', async ({ page }) => {
   await expect(page.getByText('Review TypeScript utility types')).toBeVisible()
 })
 
+test('add button: disabled when input is empty', async ({ page }) => {
+  await expect(page.getByRole('button', { name: 'Add' })).toBeDisabled()
+})
+
+test('add button: disabled for whitespace-only input', async ({ page }) => {
+  await page.getByPlaceholder('New todo…').fill('   ')
+  await expect(page.getByRole('button', { name: 'Add' })).toBeDisabled()
+})
+
+test('add button: enabled when input has text', async ({ page }) => {
+  await page.getByPlaceholder('New todo…').fill('Write Playwright tests')
+  await expect(page.getByRole('button', { name: 'Add' })).toBeEnabled()
+})
+
+test('add: input clears immediately on submit', async ({ page }) => {
+  const input = page.getByPlaceholder('New todo…')
+  await input.fill('Write Playwright tests')
+  await page.getByRole('button', { name: 'Add' }).click()
+  await expect(input).toHaveValue('')
+})
+
 test('add: new todo appears immediately and persists', async ({ page }) => {
   await page.getByPlaceholder('New todo…').fill('Write Playwright tests')
   await page.getByRole('button', { name: 'Add' }).click()
@@ -39,7 +60,6 @@ test('toggle: strikethrough appears immediately and persists', async ({ page }) 
 
 test('delete: item disappears immediately and does not return', async ({ page }) => {
   const item = page.getByText('Build this todo app')
-  // Each list item's Delete button — target the one next to our item
   await item.locator('..').getByRole('button', { name: 'Delete' }).click()
 
   // Optimistic — gone before server responds
