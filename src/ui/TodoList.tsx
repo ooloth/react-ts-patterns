@@ -1,4 +1,4 @@
-import { startTransition, use, useOptimistic, useRef } from 'react'
+import { startTransition, use, useDeferredValue, useOptimistic, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { deleteTodo, toggleTodo } from '../api/todos'
 import type { TodosPromise } from '../api/todos'
@@ -17,6 +17,15 @@ export function TodoList({ todosPromise, onMutate }: Props) {
   const [optimisticTodos, addOptimistic] = useOptimistic(todos, applyOptimistic)
   const { mutationOptions, setFailNext } = useMutationOptions()
   const inputRef = useRef<HTMLInputElement>(null)
+  const toggleControllerRef = useRef<AbortController | null>(null)
+  const [query, setQuery] = useState('')
+  // useDeferredValue keeps the input responsive by letting React deprioritize
+  // the filtered-list re-render when it can't keep up with fast typing.
+  const deferredQuery = useDeferredValue(query)
+  const isPending = query !== deferredQuery
+  const visible = optimisticTodos.filter(t =>
+    t.title.toLowerCase().includes(deferredQuery.toLowerCase())
+  )
 
   const handleAdd = (todo: Todo) => {
     addOptimistic({ type: 'add', todo })
@@ -26,16 +35,21 @@ export function TodoList({ todosPromise, onMutate }: Props) {
   }
 
   const handleToggle = (id: TodoId) => {
+    toggleControllerRef.current?.abort()
+    const controller = new AbortController()
+    toggleControllerRef.current = controller
+
     startTransition(async () => {
       addOptimistic({ type: 'toggle', id })
-      const toastId = toast.loading('Updating…')
+      toast.loading('Updating…', { id: 'todo-update' })
       try {
-        await toggleTodo(id, mutationOptions)
-        toast.dismiss(toastId)
+        await toggleTodo(id, mutationOptions, controller.signal)
+        toast.dismiss('todo-update')
         onMutate()
-      } catch {
+      } catch (err) {
+        if ((err as Error).name === 'AbortError') return
         // useOptimistic rolls back the optimistic update automatically.
-        toast.error('Failed to update — change rolled back', { id: toastId })
+        toast.error('Failed to update — change rolled back', { id: 'todo-update' })
         setFailNext(false)
       }
     })
@@ -44,13 +58,13 @@ export function TodoList({ todosPromise, onMutate }: Props) {
   const handleDelete = (id: TodoId) => {
     startTransition(async () => {
       addOptimistic({ type: 'delete', id })
-      const toastId = toast.loading('Deleting…')
+      toast.loading('Deleting…', { id: 'todo-delete' })
       try {
         await deleteTodo(id, mutationOptions)
-        toast.dismiss(toastId)
+        toast.dismiss('todo-delete')
         onMutate()
       } catch {
-        toast.error('Failed to delete — item restored', { id: toastId })
+        toast.error('Failed to delete — item restored', { id: 'todo-delete' })
         setFailNext(false)
       }
     })
@@ -58,9 +72,16 @@ export function TodoList({ todosPromise, onMutate }: Props) {
 
   return (
     <>
+      <input
+        type="search"
+        value={query}
+        onChange={e => setQuery(e.target.value)}
+        placeholder="Filter todos…"
+        className="mt-6 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+      />
       <AddTodoForm ref={inputRef} onAdd={handleAdd} onMutate={onMutate} />
-      <ul className="mt-4 divide-y divide-gray-200">
-        {optimisticTodos.map(todo => (
+      <ul className={`mt-4 divide-y divide-gray-200 ${isPending ? 'opacity-50' : ''}`}>
+        {visible.map(todo => (
           <li key={todo.id} className="flex items-center gap-3 py-3">
             <input
               type="checkbox"

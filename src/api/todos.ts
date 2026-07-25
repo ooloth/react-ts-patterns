@@ -3,7 +3,14 @@ import { TodoIdSchema } from '../domain/schema'
 import type { RawTodo, Todo, TodoId } from '../domain/schema'
 import { toggleStatus } from '../domain/todos'
 
-const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
+const delay = (ms: number, signal?: AbortSignal) =>
+  new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(resolve, ms)
+    signal?.addEventListener('abort', () => {
+      clearTimeout(timer)
+      reject(Object.assign(new Error('Aborted'), { name: 'AbortError' }))
+    }, { once: true })
+  })
 
 // Mutable in-memory store — mutations replace entries, never mutate objects.
 // TodoIdSchema.parse() brands the string literals so they satisfy TodoId.
@@ -45,8 +52,8 @@ export async function addTodo(todo: Todo, options: MutationOptions = DEFAULT_MUT
   return { ...todo }
 }
 
-export async function toggleTodo(id: TodoId, options: MutationOptions = DEFAULT_MUTATION_OPTIONS): Promise<RawTodo> {
-  await delay(options.delayMs)
+export async function toggleTodo(id: TodoId, options: MutationOptions = DEFAULT_MUTATION_OPTIONS, signal?: AbortSignal): Promise<RawTodo> {
+  await delay(options.delayMs, signal)
   if (options.shouldFail) throw new Error('Simulated failure')
   store = store.map(todo =>
     todo.id === id

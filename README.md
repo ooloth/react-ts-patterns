@@ -49,6 +49,8 @@ Dependency direction: `domain` ← `api` ← `ui`. Nothing in `domain/` imports 
 | `useOptimistic` | `TodoList` applies toggle and delete instantly in the UI; React rolls back the optimistic state automatically if the server call fails |
 | `startTransition` (sync) | Wraps re-fetches after mutations so Suspense keeps the current list visible instead of flashing the loading fallback |
 | `startTransition` (async) | React 19 extended `startTransition` to accept async functions — toggle and delete use this to sequence the optimistic update, server call, and re-fetch inside a single transition |
+| `AbortController` | `toggleTodo` accepts an optional `AbortSignal`; `handleToggle` aborts the previous in-flight request before starting a new one — the stale transition ends early (cleaning up its optimistic update), and the shared loading toast stays visible until the latest operation settles |
+| `useDeferredValue` | `TodoList` filters todos by a deferred copy of the search query — the input stays responsive while React deprioritizes the filtered-list re-render; `isPending = query !== deferredQuery` can dim the list while the two values differ (the effect is imperceptible with small lists; it becomes meaningful when rendering each row is expensive) |
 | `ref` as a plain prop | `AddTodoForm` accepts `ref` as a regular prop; `TodoList` passes `ref={inputRef}` with no `forwardRef` wrapper — the React 19 way to expose a child element's ref to a parent |
 | `<Context value={...}>` | `App` provides `DebugContext` with React 19's shorthand — no `.Provider` needed |
 | Suspense + ErrorBoundary | `App` wraps `TodoList` in both; `react-error-boundary` supplies the `ErrorBoundary` component |
@@ -70,14 +72,10 @@ Dependency direction: `domain` ← `api` ← `ui`. Nothing in `domain/` imports 
 | `TodoSchema.omit()` | `CreateTodoInput` is derived structurally — no manual duplication of fields |
 | `ReturnType<>` | `TodosPromise = ReturnType<typeof fetchTodos>` — the prop and state types stay in sync with the function signature automatically |
 
-## Design notes
+## Todos 😉
 
-**`applyOptimistic` as a pure function** — any logic of the shape `(state, action) → newState`
-belongs outside components as a plain function. `applyOptimistic` follows this pattern: it is
-independently testable without React and keeps `TodoList` thin. A natural extension would be to
-move all such reducers into `domain/` and unit-test them there.
-
-**Implicit finite state machines** — `ActionState` in `AddTodoForm` and `RemoteData<T>` are both
-implicit FSMs: a fixed set of states with defined transitions. For more complex UI, making these
-explicit (e.g. with XState or a typed reducer) prevents impossible states at the component level,
-not just the type level.
+- Move all `(state, action) → newState` reducers into `domain/` and unit-test them there —
+  `applyOptimistic` already follows this shape; the rest of the mutation logic could too
+- Make the implicit FSMs explicit with XState or a typed reducer — `ActionState` in `AddTodoForm`
+  and `RemoteData<T>` both have a fixed state set with defined transitions; explicit machines
+  prevent impossible states at the component level, not just the type level

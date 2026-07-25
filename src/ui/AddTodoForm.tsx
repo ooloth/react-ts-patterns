@@ -29,13 +29,13 @@ export function AddTodoForm({ ref, onAdd, onMutate }: Props) {
       }
 
       onAdd(todo)
-      const toastId = toast.loading('Adding…')
+      toast.loading('Adding…', { id: 'todo-add' })
       try {
         await addTodo(todo, mutationOptions)
-        toast.dismiss(toastId)
+        toast.dismiss('todo-add')
         onMutate()
       } catch {
-        toast.error('Failed to add — item removed', { id: toastId })
+        toast.error('Failed to add — item removed', { id: 'todo-add' })
         setFailNext(false)
       }
       return null

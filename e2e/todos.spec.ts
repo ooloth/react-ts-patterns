@@ -76,6 +76,22 @@ test('delete: item disappears immediately and does not return', async ({ page })
   await expect(item).not.toBeVisible()
 })
 
+test('filter: shows only matching todos', async ({ page }) => {
+  await page.getByPlaceholder('Filter todos…').fill('React')
+  await expect(page.getByText('Read the React 19 docs')).toBeVisible()
+  await expect(page.getByText('Build this todo app')).not.toBeVisible()
+  await expect(page.getByText('Review TypeScript utility types')).not.toBeVisible()
+})
+
+test('filter: clearing the query restores all todos', async ({ page }) => {
+  const filter = page.getByPlaceholder('Filter todos…')
+  await filter.fill('React')
+  await expect(page.getByText('Build this todo app')).not.toBeVisible()
+  await filter.clear()
+  await expect(page.getByText('Build this todo app')).toBeVisible()
+  await expect(page.getByText('Review TypeScript utility types')).toBeVisible()
+})
+
 test('fail-next: optimistic update rolls back on server error', async ({ page }) => {
   await page.getByLabel('Fail next request').check()
 
