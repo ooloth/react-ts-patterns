@@ -49,7 +49,7 @@ export function AddTodoForm({ onAdd, onMutate }: Props) {
         required
         className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm"
       />
-      <SubmitButton label="Add" pendingLabel="Adding…" />
+      <SubmitButton label="Add" />
       {state.status === 'error' && (
         <p className="mt-1 text-sm text-red-600">{state.message}</p>
       )}
