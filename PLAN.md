@@ -72,6 +72,21 @@ A todo list with fake async latency on every operation — no real server, but w
 
 ---
 
+## Folder Structure
+
+```
+src/
+  domain/       # pure types and Zod schemas — no React, no I/O
+  api/          # mock async functions — imports from domain/, has delays/side effects
+  ui/           # React components — imports from both
+  App.tsx       # root component
+  main.tsx      # entry point
+```
+
+Dependency direction: `domain` ← `api` ← `ui`. Nothing in `domain/` imports from `api/` or `ui/`.
+
+---
+
 ## What to Skip
 
 - Routing, auth, real persistence — out of scope
