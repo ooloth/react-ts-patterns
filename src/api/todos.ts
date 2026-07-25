@@ -1,9 +1,8 @@
+import { DELAY_PRESETS } from '../domain/debug'
 import { TodoIdSchema, TodoSchema } from '../domain/schema'
 import type { RawTodo, Todo, TodoId } from '../domain/schema'
 
 const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
-
-const SIMULATED_NETWORK_DELAY_MS = 1500
 
 // Mutable in-memory store — mutations replace entries, never mutate objects.
 // TodoIdSchema.parse() brands the string literals so they satisfy TodoId.
@@ -13,9 +12,19 @@ let store: Todo[] = [
   { id: TodoIdSchema.parse('3'), title: 'Review TypeScript utility types', status: 'completed', createdAt: '2026-07-25T09:02:00.000Z' },
 ]
 
+export type MutationOptions = {
+  delayMs: number
+  shouldFail: boolean
+}
+
+const DEFAULT_MUTATION_OPTIONS: MutationOptions = {
+  delayMs: DELAY_PRESETS.normal,
+  shouldFail: false,
+}
+
 // Returns unknown[] — callers must parse before trusting the shape.
 export async function fetchTodos(): Promise<RawTodo[]> {
-  await delay(SIMULATED_NETWORK_DELAY_MS)
+  await delay(DELAY_PRESETS.normal)
   // Spread each object to simulate serialisation: the values cross a boundary
   // and arrive as plain objects, not typed Todo instances.
   return store.map(todo => ({ ...todo }))
@@ -30,15 +39,16 @@ export function parseTodo(raw: RawTodo): Todo {
 // Accepts a fully-formed Todo — the caller (client) is responsible for
 // generating id and createdAt. This lets the optimistic item and the real
 // item share the same key, so React reconciles them without a flicker.
-export async function addTodo(todo: Todo): Promise<RawTodo> {
-  await delay(SIMULATED_NETWORK_DELAY_MS)
+export async function addTodo(todo: Todo, options: MutationOptions = DEFAULT_MUTATION_OPTIONS): Promise<RawTodo> {
+  await delay(options.delayMs)
+  if (options.shouldFail) throw new Error('Simulated failure')
   store = [...store, todo]
   return { ...todo }
 }
 
-// Returns the updated todo so callers can reconcile optimistic state.
-export async function toggleTodo(id: TodoId): Promise<RawTodo> {
-  await delay(SIMULATED_NETWORK_DELAY_MS)
+export async function toggleTodo(id: TodoId, options: MutationOptions = DEFAULT_MUTATION_OPTIONS): Promise<RawTodo> {
+  await delay(options.delayMs)
+  if (options.shouldFail) throw new Error('Simulated failure')
   store = store.map(todo =>
     todo.id === id
       ? { ...todo, status: todo.status === 'active' ? 'completed' : 'active' } satisfies Todo
@@ -49,7 +59,8 @@ export async function toggleTodo(id: TodoId): Promise<RawTodo> {
   return { ...updated }
 }
 
-export async function deleteTodo(id: TodoId): Promise<void> {
-  await delay(SIMULATED_NETWORK_DELAY_MS)
+export async function deleteTodo(id: TodoId, options: MutationOptions = DEFAULT_MUTATION_OPTIONS): Promise<void> {
+  await delay(options.delayMs)
+  if (options.shouldFail) throw new Error('Simulated failure')
   store = store.filter(todo => todo.id !== id)
 }

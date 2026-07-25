@@ -1,6 +1,7 @@
-import { useActionState } from 'react'
+import { use, useActionState } from 'react'
 import { toast } from 'sonner'
 import { addTodo } from '../api/todos'
+import { DebugContext, DELAY_PRESETS } from '../domain/debug'
 import { TodoIdSchema } from '../domain/schema'
 import type { Todo } from '../domain/schema'
 import { SubmitButton } from './SubmitButton'
@@ -15,6 +16,9 @@ type ActionState =
   | { status: 'error'; message: string }
 
 export function AddTodoForm({ onAdd, onMutate }: Props) {
+  const { delayPreset, failNext, setFailNext } = use(DebugContext)
+  const mutationOptions = { delayMs: DELAY_PRESETS[delayPreset], shouldFail: failNext }
+
   const [state, formAction] = useActionState(
     async (_prev: ActionState, formData: FormData): Promise<ActionState> => {
       const title = formData.get('title')
@@ -32,11 +36,12 @@ export function AddTodoForm({ onAdd, onMutate }: Props) {
       onAdd(todo)
       const toastId = toast.loading('Adding…')
       try {
-        await addTodo(todo)
+        await addTodo(todo, mutationOptions)
         toast.dismiss(toastId)
         onMutate()
       } catch {
         toast.error('Failed to add — item removed', { id: toastId })
+        setFailNext(false)
       }
       return { status: 'idle' }
     },

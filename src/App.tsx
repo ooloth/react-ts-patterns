@@ -1,21 +1,24 @@
 import { Suspense, startTransition, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Toaster } from 'sonner'
+import { DebugContext } from './domain/debug'
+import type { DelayPreset } from './domain/debug'
 import { fetchTodos } from './api/todos'
+import { DebugToolbar } from './ui/DebugToolbar'
 import { TodoList } from './ui/TodoList'
 
 export default function App() {
   const [todosPromise, setTodosPromise] = useState(() => fetchTodos())
+  const [delayPreset, setDelayPreset] = useState<DelayPreset>('normal')
+  const [failNext, setFailNext] = useState(false)
 
-  // Wrapping in startTransition prevents Suspense from showing its fallback
-  // during the re-fetch — React keeps the current list visible until the new
-  // data is ready, then swaps it in. Without this, every mutation causes a
-  // full loading flash even though we already have content to show.
   const refresh = () => startTransition(() => setTodosPromise(fetchTodos()))
 
+  // React 19: <Context value={...}> replaces <Context.Provider value={...}>.
+  // The .Provider form still works but is no longer necessary.
   return (
-    <>
-      <main className="mx-auto max-w-xl p-8">
+    <DebugContext value={{ delayPreset, failNext, setDelayPreset, setFailNext }}>
+      <main className="mx-auto max-w-xl p-8 pb-16">
         <h1 className="text-2xl font-semibold">Todos</h1>
         <ErrorBoundary fallbackRender={({ error }) => (
           <p className="mt-4 text-red-600">
@@ -27,6 +30,7 @@ export default function App() {
           </Suspense>
         </ErrorBoundary>
       </main>
+      <DebugToolbar />
       <Toaster
         position="bottom-right"
         toastOptions={{
@@ -38,6 +42,6 @@ export default function App() {
           },
         }}
       />
-    </>
+    </DebugContext>
   )
 }

@@ -1,6 +1,7 @@
 import { startTransition, use, useOptimistic } from 'react'
 import { toast } from 'sonner'
 import { deleteTodo, parseTodo, toggleTodo } from '../api/todos'
+import { DebugContext, DELAY_PRESETS } from '../domain/debug'
 import type { RawTodo, Todo, TodoId } from '../domain/schema'
 import { AddTodoForm } from './AddTodoForm'
 
@@ -32,6 +33,9 @@ function applyOptimistic(todos: Todo[], action: OptimisticAction): Todo[] {
 export function TodoList({ todosPromise, onMutate }: Props) {
   const todos: Todo[] = use(todosPromise).map(parseTodo)
   const [optimisticTodos, addOptimistic] = useOptimistic(todos, applyOptimistic)
+  // use(context) — reads DebugContext the same way use(promise) reads a promise.
+  const { delayPreset, failNext, setFailNext } = use(DebugContext)
+  const mutationOptions = { delayMs: DELAY_PRESETS[delayPreset], shouldFail: failNext }
 
   const handleAdd = (todo: Todo) => addOptimistic({ type: 'add', todo })
 
@@ -40,12 +44,13 @@ export function TodoList({ todosPromise, onMutate }: Props) {
       addOptimistic({ type: 'toggle', id })
       const toastId = toast.loading('Updating…')
       try {
-        await toggleTodo(id)
+        await toggleTodo(id, mutationOptions)
         toast.dismiss(toastId)
         onMutate()
       } catch {
         // useOptimistic rolls back the optimistic update automatically.
         toast.error('Failed to update — change rolled back', { id: toastId })
+        setFailNext(false)
       }
     })
   }
@@ -55,11 +60,12 @@ export function TodoList({ todosPromise, onMutate }: Props) {
       addOptimistic({ type: 'delete', id })
       const toastId = toast.loading('Deleting…')
       try {
-        await deleteTodo(id)
+        await deleteTodo(id, mutationOptions)
         toast.dismiss(toastId)
         onMutate()
       } catch {
         toast.error('Failed to delete — item restored', { id: toastId })
+        setFailNext(false)
       }
     })
   }
