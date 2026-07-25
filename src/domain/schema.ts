@@ -20,3 +20,12 @@ export const TodoSchema = z.object({
   createdAt: z.string().datetime(),
 })
 export type Todo = Readonly<z.infer<typeof TodoSchema>>
+
+// What a caller submits to create a todo — id and createdAt are assigned
+// server-side, so callers must not (and cannot) provide them.
+export const CreateTodoInputSchema = TodoSchema.omit({ id: true, createdAt: true })
+export type CreateTodoInput = z.infer<typeof CreateTodoInputSchema>
+
+// The shape the fake API returns before parsing — unknown forces callers to
+// prove the shape rather than trusting it. This is what .safeParse() accepts.
+export type RawTodo = unknown
