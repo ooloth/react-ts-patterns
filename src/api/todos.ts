@@ -3,6 +3,8 @@ import type { RawTodo, Todo, TodoId } from '../domain/schema'
 
 const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
 
+const SIMULATED_NETWORK_DELAY_MS = 1500
+
 // Mutable in-memory store — mutations replace entries, never mutate objects.
 // TodoIdSchema.parse() brands the string literals so they satisfy TodoId.
 let store: Todo[] = [
@@ -13,7 +15,7 @@ let store: Todo[] = [
 
 // Returns unknown[] — callers must parse before trusting the shape.
 export async function fetchTodos(): Promise<RawTodo[]> {
-  await delay(600)
+  await delay(SIMULATED_NETWORK_DELAY_MS)
   // Spread each object to simulate serialisation: the values cross a boundary
   // and arrive as plain objects, not typed Todo instances.
   return store.map(todo => ({ ...todo }))
@@ -29,14 +31,14 @@ export function parseTodo(raw: RawTodo): Todo {
 // generating id and createdAt. This lets the optimistic item and the real
 // item share the same key, so React reconciles them without a flicker.
 export async function addTodo(todo: Todo): Promise<RawTodo> {
-  await delay(400)
+  await delay(SIMULATED_NETWORK_DELAY_MS)
   store = [...store, todo]
   return { ...todo }
 }
 
 // Returns the updated todo so callers can reconcile optimistic state.
 export async function toggleTodo(id: TodoId): Promise<RawTodo> {
-  await delay(300)
+  await delay(SIMULATED_NETWORK_DELAY_MS)
   store = store.map(todo =>
     todo.id === id
       ? { ...todo, status: todo.status === 'active' ? 'completed' : 'active' } satisfies Todo
@@ -48,6 +50,6 @@ export async function toggleTodo(id: TodoId): Promise<RawTodo> {
 }
 
 export async function deleteTodo(id: TodoId): Promise<void> {
-  await delay(300)
+  await delay(SIMULATED_NETWORK_DELAY_MS)
   store = store.filter(todo => todo.id !== id)
 }

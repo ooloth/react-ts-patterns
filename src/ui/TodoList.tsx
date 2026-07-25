@@ -1,4 +1,5 @@
-import { use, useOptimistic, useTransition } from 'react'
+import { startTransition, use, useOptimistic } from 'react'
+import { toast } from 'sonner'
 import { deleteTodo, parseTodo, toggleTodo } from '../api/todos'
 import type { RawTodo, Todo, TodoId } from '../domain/schema'
 import { AddTodoForm } from './AddTodoForm'
@@ -31,23 +32,20 @@ function applyOptimistic(todos: Todo[], action: OptimisticAction): Todo[] {
 export function TodoList({ todosPromise, onMutate }: Props) {
   const todos: Todo[] = use(todosPromise).map(parseTodo)
   const [optimisticTodos, addOptimistic] = useOptimistic(todos, applyOptimistic)
-  // isPending is true while a toggle or delete transition is in flight.
-  // useTransition covers only the transitions started here — the add transition
-  // is internal to useActionState and not included, but add is already optimistic
-  // so there's nothing meaningful to indicate there.
-  const [isPending, startTransition] = useTransition()
 
-  // Wraps addOptimistic so AddTodoForm doesn't need to know about OptimisticAction.
   const handleAdd = (todo: Todo) => addOptimistic({ type: 'add', todo })
 
   const handleToggle = (id: TodoId) => {
     startTransition(async () => {
       addOptimistic({ type: 'toggle', id })
+      const toastId = toast.loading('Updating…')
       try {
         await toggleTodo(id)
+        toast.dismiss(toastId)
         onMutate()
       } catch {
-        // Optimistic update rolls back automatically when the transition ends.
+        // useOptimistic rolls back the optimistic update automatically.
+        toast.error('Failed to update — change rolled back', { id: toastId })
       }
     })
   }
@@ -55,11 +53,13 @@ export function TodoList({ todosPromise, onMutate }: Props) {
   const handleDelete = (id: TodoId) => {
     startTransition(async () => {
       addOptimistic({ type: 'delete', id })
+      const toastId = toast.loading('Deleting…')
       try {
         await deleteTodo(id)
+        toast.dismiss(toastId)
         onMutate()
       } catch {
-        // Optimistic update rolls back automatically when the transition ends.
+        toast.error('Failed to delete — item restored', { id: toastId })
       }
     })
   }
@@ -67,7 +67,6 @@ export function TodoList({ todosPromise, onMutate }: Props) {
   return (
     <>
       <AddTodoForm onAdd={handleAdd} onMutate={onMutate} />
-      {isPending && <p className="mt-2 text-xs text-gray-400">Updating…</p>}
       <ul className="mt-4 divide-y divide-gray-200">
         {optimisticTodos.map(todo => (
           <li key={todo.id} className="flex items-center gap-3 py-3">

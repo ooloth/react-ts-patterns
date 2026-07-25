@@ -1,12 +1,11 @@
 import { useActionState } from 'react'
+import { toast } from 'sonner'
 import { addTodo } from '../api/todos'
 import { TodoIdSchema } from '../domain/schema'
 import type { Todo } from '../domain/schema'
 import { SubmitButton } from './SubmitButton'
 
 type Props = {
-  // Called immediately with the full Todo before the API roundtrip, so the
-  // parent can apply an optimistic update using the same id and shape.
   onAdd: (todo: Todo) => void
   onMutate: () => void
 }
@@ -23,8 +22,6 @@ export function AddTodoForm({ onAdd, onMutate }: Props) {
         return { status: 'error', message: 'Title is required' }
       }
 
-      // Generate id and createdAt on the client so the optimistic item and
-      // the stored item share the same key — no flicker on reconciliation.
       const todo: Todo = {
         id: TodoIdSchema.parse(crypto.randomUUID()),
         title: title.trim(),
@@ -33,8 +30,14 @@ export function AddTodoForm({ onAdd, onMutate }: Props) {
       }
 
       onAdd(todo)
-      await addTodo(todo)
-      onMutate()
+      const toastId = toast.loading('Adding…')
+      try {
+        await addTodo(todo)
+        toast.dismiss(toastId)
+        onMutate()
+      } catch {
+        toast.error('Failed to add — item removed', { id: toastId })
+      }
       return { status: 'idle' }
     },
     { status: 'idle' },
