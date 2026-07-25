@@ -1,9 +1,9 @@
 import { startTransition, use, useOptimistic } from 'react'
 import { toast } from 'sonner'
 import { deleteTodo, parseTodo, toggleTodo } from '../api/todos'
-import { DebugContext, DELAY_PRESETS } from '../domain/debug'
 import type { RawTodo, Todo, TodoId } from '../domain/schema'
 import { AddTodoForm } from './AddTodoForm'
+import { useMutationOptions } from './useMutationOptions'
 
 type Props = {
   todosPromise: Promise<RawTodo[]>
@@ -33,9 +33,7 @@ function applyOptimistic(todos: Todo[], action: OptimisticAction): Todo[] {
 export function TodoList({ todosPromise, onMutate }: Props) {
   const todos: Todo[] = use(todosPromise).map(parseTodo)
   const [optimisticTodos, addOptimistic] = useOptimistic(todos, applyOptimistic)
-  // use(context) — reads DebugContext the same way use(promise) reads a promise.
-  const { delayPreset, failNext, setFailNext } = use(DebugContext)
-  const mutationOptions = { delayMs: DELAY_PRESETS[delayPreset], shouldFail: failNext }
+  const { mutationOptions, setFailNext } = useMutationOptions()
 
   const handleAdd = (todo: Todo) => addOptimistic({ type: 'add', todo })
 
