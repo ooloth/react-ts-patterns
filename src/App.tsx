@@ -1,4 +1,4 @@
-import { Suspense, useState } from 'react'
+import { Suspense, startTransition, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { fetchTodos } from './api/todos'
 import { AddTodoForm } from './ui/AddTodoForm'
@@ -10,7 +10,11 @@ export default function App() {
   // uses the initialiser form so fetchTodos() runs once, not on every render.
   const [todosPromise, setTodosPromise] = useState(() => fetchTodos())
 
-  const refresh = () => setTodosPromise(fetchTodos())
+  // Wrapping in startTransition prevents Suspense from showing its fallback
+  // during the re-fetch — React keeps the current list visible until the new
+  // data is ready, then swaps it in. Without this, every mutation causes a
+  // full loading flash even though we already have content to show.
+  const refresh = () => startTransition(() => setTodosPromise(fetchTodos()))
 
   return (
     <main className="mx-auto max-w-xl p-8">
@@ -22,7 +26,7 @@ export default function App() {
         </p>
       )}>
         <Suspense fallback={<p className="mt-4 text-gray-400">Loading…</p>}>
-          <TodoList todosPromise={todosPromise} />
+          <TodoList todosPromise={todosPromise} onMutate={refresh} />
         </Suspense>
       </ErrorBoundary>
     </main>

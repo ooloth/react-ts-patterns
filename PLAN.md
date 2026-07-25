@@ -87,6 +87,21 @@ Dependency direction: `domain` ← `api` ← `ui`. Nothing in `domain/` imports 
 
 ---
 
+## Later / Stretch
+
+**Pure functions and unit testability** — any logic that maps `(state, action) → newState`
+belongs outside components as a plain function. `applyOptimistic` already follows this
+pattern. A useful extension: extract all such reducers into `domain/` and write unit
+tests for them without React. Keeps components thin and logic independently verifiable.
+
+**Finite state machines** — `ActionState` in `AddTodoForm` and `RemoteData<T>` are
+implicit FSMs. For UI with more complex state transitions, making them explicit (e.g.
+with `xstate` or a hand-rolled typed reducer) prevents impossible states at the
+component level, not just the type level. Out of scope for this exercise but worth
+naming in the interview as a known technique.
+
+---
+
 ## What to Skip
 
 - Routing, auth, real persistence — out of scope
