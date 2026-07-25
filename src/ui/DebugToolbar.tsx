@@ -14,7 +14,7 @@ export function DebugToolbar() {
   const { delayPreset, failNext, setDelayPreset, setFailNext } = use(DebugContext)
 
   return (
-    <div className="fixed bottom-0 inset-x-0 border-t border-gray-200 bg-gray-50 px-4 py-2 flex items-center gap-6 text-xs text-gray-500">
+    <div className="fixed bottom-0 inset-x-0 border-t border-gray-200 bg-gray-50 px-4 py-2 flex items-center justify-center gap-6 text-xs text-gray-500">
       <span className="font-medium text-gray-400 uppercase tracking-wide">Debug</span>
       <div className="flex items-center gap-2">
         <span>Delay:</span>
