@@ -28,8 +28,8 @@ const DEFAULT_MUTATION_OPTIONS: MutationOptions = {
 export type TodosPromise = ReturnType<typeof fetchTodos>
 
 // Returns unknown[] — callers must parse before trusting the shape.
-export async function fetchTodos(): Promise<RawTodo[]> {
-  await delay(DELAY_PRESETS.normal)
+export async function fetchTodos(delayMs = DELAY_PRESETS.instant): Promise<RawTodo[]> {
+  await delay(delayMs)
   // Spread each object to simulate serialisation: the values cross a boundary
   // and arrive as plain objects, not typed Todo instances.
   return store.map(todo => ({ ...todo }))

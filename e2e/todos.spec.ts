@@ -13,6 +13,12 @@ test('page loads with seed todos', async ({ page }) => {
   await expect(page.getByText('Review TypeScript utility types')).toBeVisible()
 })
 
+test('add input: re-focused after adding a todo', async ({ page }) => {
+  await page.getByPlaceholder('New todo…').fill('Write Playwright tests')
+  await page.getByRole('button', { name: 'Add' }).click()
+  await expect(page.getByPlaceholder('New todo…')).toBeFocused()
+})
+
 test('add button: disabled when input is empty', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Add' })).toBeDisabled()
 })

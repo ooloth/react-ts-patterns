@@ -1,4 +1,4 @@
-import { startTransition, use, useOptimistic } from 'react'
+import { startTransition, use, useEffect, useOptimistic, useRef } from 'react'
 import { toast } from 'sonner'
 import { deleteTodo, toggleTodo } from '../api/todos'
 import type { TodosPromise } from '../api/todos'
@@ -16,8 +16,19 @@ export function TodoList({ todosPromise, onMutate }: Props) {
   const todos: Todo[] = use(todosPromise).map(parseTodo)
   const [optimisticTodos, addOptimistic] = useOptimistic(todos, applyOptimistic)
   const { mutationOptions, setFailNext } = useMutationOptions()
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleAdd = (todo: Todo) => addOptimistic({ type: 'add', todo })
+  // autoFocus doesn't fire reliably when React mounts after Suspense resolves
+  // (it's a browser behaviour tied to initial DOM insertion, not React mounts).
+  // useEffect is the reliable alternative.
+  useEffect(() => { inputRef.current?.focus() }, [])
+
+  const handleAdd = (todo: Todo) => {
+    addOptimistic({ type: 'add', todo })
+    // Re-focus after the optimistic add so the user can type the next todo
+    // without clicking back into the input.
+    inputRef.current?.focus()
+  }
 
   const handleToggle = (id: TodoId) => {
     startTransition(async () => {
@@ -52,7 +63,7 @@ export function TodoList({ todosPromise, onMutate }: Props) {
 
   return (
     <>
-      <AddTodoForm onAdd={handleAdd} onMutate={onMutate} />
+      <AddTodoForm ref={inputRef} onAdd={handleAdd} onMutate={onMutate} />
       <ul className="mt-4 divide-y divide-gray-200">
         {optimisticTodos.map(todo => (
           <li key={todo.id} className="flex items-center gap-3 py-3">

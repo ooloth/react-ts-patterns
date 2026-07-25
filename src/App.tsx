@@ -1,7 +1,7 @@
 import { Suspense, startTransition, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Toaster } from "sonner";
-import { DebugContext } from "./domain/debug";
+import { DebugContext, DELAY_PRESETS } from "./domain/debug";
 import type { DelayPreset } from "./domain/debug";
 import { fetchTodos } from "./api/todos";
 import type { TodosPromise } from "./api/todos";
@@ -15,7 +15,7 @@ export default function App() {
   const [delayPreset, setDelayPreset] = useState<DelayPreset>("instant");
   const [failNext, setFailNext] = useState(false);
 
-  const refresh = () => startTransition(() => setTodosPromise(fetchTodos()));
+  const refresh = () => startTransition(() => setTodosPromise(fetchTodos(DELAY_PRESETS[delayPreset])));
 
   // React 19: <Context value={...}> replaces <Context.Provider value={...}>.
   // The .Provider form still works but is no longer necessary.

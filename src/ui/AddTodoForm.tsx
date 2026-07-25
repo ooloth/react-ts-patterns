@@ -1,4 +1,5 @@
 import { useActionState, useState } from 'react'
+import type { Ref } from 'react'
 import { toast } from 'sonner'
 import { addTodo } from '../api/todos'
 import { TodoIdSchema } from '../domain/schema'
@@ -7,11 +8,14 @@ import { SubmitButton } from './SubmitButton'
 import { useMutationOptions } from './useMutationOptions'
 
 type Props = {
+  // React 19: ref is a plain prop — no forwardRef wrapper needed.
+  // Before React 19, passing a ref to a custom component required forwardRef.
+  ref?: Ref<HTMLInputElement>
   onAdd: (todo: Todo) => void
   onMutate: () => void
 }
 
-export function AddTodoForm({ onAdd, onMutate }: Props) {
+export function AddTodoForm({ ref, onAdd, onMutate }: Props) {
   const [title, setTitle] = useState('')
   const { mutationOptions, setFailNext } = useMutationOptions()
 
@@ -44,6 +48,7 @@ export function AddTodoForm({ onAdd, onMutate }: Props) {
     // Clearing title here gives optimistic input reset before the await.
     <form action={formAction} onSubmit={() => setTitle('')} className="mt-6 flex gap-2">
       <input
+        ref={ref}
         name="title"
         type="text"
         value={title}

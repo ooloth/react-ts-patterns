@@ -49,6 +49,7 @@ Dependency direction: `domain` ← `api` ← `ui`. Nothing in `domain/` imports 
 | `useOptimistic` | `TodoList` applies toggle and delete instantly in the UI; React rolls back the optimistic state automatically if the server call fails |
 | `startTransition` (sync) | Wraps re-fetches after mutations so Suspense keeps the current list visible instead of flashing the loading fallback |
 | `startTransition` (async) | React 19 extended `startTransition` to accept async functions — toggle and delete use this to sequence the optimistic update, server call, and re-fetch inside a single transition |
+| `ref` as a plain prop | `AddTodoForm` accepts `ref` as a regular prop; `TodoList` passes `ref={inputRef}` with no `forwardRef` wrapper — the React 19 way to expose a child element's ref to a parent |
 | `<Context value={...}>` | `App` provides `DebugContext` with React 19's shorthand — no `.Provider` needed |
 | Suspense + ErrorBoundary | `App` wraps `TodoList` in both; `react-error-boundary` supplies the `ErrorBoundary` component |
 | `eslint-plugin-react-compiler` | Errors on Rules of React violations that cause the compiler to bail out on a component and skip automatic memoization |
