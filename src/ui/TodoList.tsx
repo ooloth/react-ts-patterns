@@ -1,4 +1,4 @@
-import { startTransition, use, useEffect, useOptimistic, useRef } from 'react'
+import { startTransition, use, useOptimistic, useRef } from 'react'
 import { toast } from 'sonner'
 import { deleteTodo, toggleTodo } from '../api/todos'
 import type { TodosPromise } from '../api/todos'
@@ -17,11 +17,6 @@ export function TodoList({ todosPromise, onMutate }: Props) {
   const [optimisticTodos, addOptimistic] = useOptimistic(todos, applyOptimistic)
   const { mutationOptions, setFailNext } = useMutationOptions()
   const inputRef = useRef<HTMLInputElement>(null)
-
-  // autoFocus doesn't fire reliably when React mounts after Suspense resolves
-  // (it's a browser behaviour tied to initial DOM insertion, not React mounts).
-  // useEffect is the reliable alternative.
-  useEffect(() => { inputRef.current?.focus() }, [])
 
   const handleAdd = (todo: Todo) => {
     addOptimistic({ type: 'add', todo })
