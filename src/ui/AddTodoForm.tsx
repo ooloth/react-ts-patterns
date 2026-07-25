@@ -1,28 +1,40 @@
 import { useActionState } from 'react'
 import { addTodo } from '../api/todos'
+import { TodoIdSchema } from '../domain/schema'
+import type { Todo } from '../domain/schema'
 import { SubmitButton } from './SubmitButton'
 
 type Props = {
-  onSuccess: () => void
+  // Called immediately with the full Todo before the API roundtrip, so the
+  // parent can apply an optimistic update using the same id and shape.
+  onAdd: (todo: Todo) => void
+  onMutate: () => void
 }
 
 type ActionState =
   | { status: 'idle' }
   | { status: 'error'; message: string }
 
-// useActionState wraps an async action and returns [state, action, isPending].
-// Passing the action to <form action={...}> makes React treat the submission as
-// a transition — the UI stays interactive while the action runs, and isPending
-// reflects the in-flight state. No useState or useEffect needed for this flow.
-export function AddTodoForm({ onSuccess }: Props) {
+export function AddTodoForm({ onAdd, onMutate }: Props) {
   const [state, formAction] = useActionState(
     async (_prev: ActionState, formData: FormData): Promise<ActionState> => {
       const title = formData.get('title')
       if (typeof title !== 'string' || title.trim() === '') {
         return { status: 'error', message: 'Title is required' }
       }
-      await addTodo({ title: title.trim(), status: 'active' })
-      onSuccess()
+
+      // Generate id and createdAt on the client so the optimistic item and
+      // the stored item share the same key — no flicker on reconciliation.
+      const todo: Todo = {
+        id: TodoIdSchema.parse(crypto.randomUUID()),
+        title: title.trim(),
+        status: 'active',
+        createdAt: new Date().toISOString(),
+      }
+
+      onAdd(todo)
+      await addTodo(todo)
+      onMutate()
       return { status: 'idle' }
     },
     { status: 'idle' },

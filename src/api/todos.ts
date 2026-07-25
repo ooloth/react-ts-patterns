@@ -1,5 +1,5 @@
 import { TodoIdSchema, TodoSchema } from '../domain/schema'
-import type { CreateTodoInput, RawTodo, Todo, TodoId } from '../domain/schema'
+import type { RawTodo, Todo, TodoId } from '../domain/schema'
 
 const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
 
@@ -25,15 +25,11 @@ export function parseTodo(raw: RawTodo): Todo {
   return TodoSchema.parse(raw)
 }
 
-export async function addTodo(input: CreateTodoInput): Promise<RawTodo> {
+// Accepts a fully-formed Todo — the caller (client) is responsible for
+// generating id and createdAt. This lets the optimistic item and the real
+// item share the same key, so React reconciles them without a flicker.
+export async function addTodo(todo: Todo): Promise<RawTodo> {
   await delay(400)
-  const todo: Todo = {
-    // crypto.randomUUID() is available in all modern browsers and Node 19+
-    id: TodoIdSchema.parse(crypto.randomUUID()),
-    title: input.title,
-    status: input.status,
-    createdAt: new Date().toISOString(),
-  }
   store = [...store, todo]
   return { ...todo }
 }

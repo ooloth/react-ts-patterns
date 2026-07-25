@@ -1,19 +1,22 @@
 import { startTransition, use, useOptimistic } from 'react'
 import { deleteTodo, parseTodo, toggleTodo } from '../api/todos'
 import type { RawTodo, Todo, TodoId } from '../domain/schema'
+import { AddTodoForm } from './AddTodoForm'
 
 type Props = {
   todosPromise: Promise<RawTodo[]>
   onMutate: () => void
 }
 
-// Discriminated union keeps each optimistic action's payload unambiguous.
 type OptimisticAction =
+  | { type: 'add'; todo: Todo }
   | { type: 'toggle'; id: TodoId }
   | { type: 'delete'; id: TodoId }
 
 function applyOptimistic(todos: Todo[], action: OptimisticAction): Todo[] {
   switch (action.type) {
+    case 'add':
+      return [...todos, action.todo]
     case 'toggle':
       return todos.map(t =>
         t.id === action.id
@@ -27,17 +30,11 @@ function applyOptimistic(todos: Todo[], action: OptimisticAction): Todo[] {
 
 export function TodoList({ todosPromise, onMutate }: Props) {
   const todos: Todo[] = use(todosPromise).map(parseTodo)
-
-  // useOptimistic returns a derived list that reflects in-flight changes.
-  // While a transition is pending, optimisticTodos shows the expected result.
-  // When the transition completes (or fails), React replaces it with the real
-  // todos — rolling back automatically on error.
   const [optimisticTodos, addOptimistic] = useOptimistic(todos, applyOptimistic)
 
-  // startTransition is explicit here (no form action wrapping it) because
-  // these are button-click mutations, not form submissions. The transition
-  // marks the async work as non-urgent and is what makes useOptimistic work —
-  // the optimistic update applies immediately, the await runs in the background.
+  // Wraps addOptimistic so AddTodoForm doesn't need to know about OptimisticAction.
+  const handleAdd = (todo: Todo) => addOptimistic({ type: 'add', todo })
+
   const handleToggle = (id: TodoId) => {
     startTransition(async () => {
       addOptimistic({ type: 'toggle', id })
@@ -63,25 +60,25 @@ export function TodoList({ todosPromise, onMutate }: Props) {
   }
 
   return (
-    <ul className="mt-4 divide-y divide-gray-200">
-      {optimisticTodos.map(todo => (
-        <li key={todo.id} className="flex items-center gap-3 py-3">
-          <button
-            onClick={() => handleToggle(todo.id)}
-            className="flex-1 text-left"
-          >
-            <span className={todo.status === 'completed' ? 'line-through text-gray-400' : ''}>
-              {todo.title}
-            </span>
-          </button>
-          <button
-            onClick={() => handleDelete(todo.id)}
-            className="text-sm text-red-500 hover:text-red-700"
-          >
-            Delete
-          </button>
-        </li>
-      ))}
-    </ul>
+    <>
+      <AddTodoForm onAdd={handleAdd} onMutate={onMutate} />
+      <ul className="mt-4 divide-y divide-gray-200">
+        {optimisticTodos.map(todo => (
+          <li key={todo.id} className="flex items-center gap-3 py-3">
+            <button onClick={() => handleToggle(todo.id)} className="flex-1 text-left">
+              <span className={todo.status === 'completed' ? 'line-through text-gray-400' : ''}>
+                {todo.title}
+              </span>
+            </button>
+            <button
+              onClick={() => handleDelete(todo.id)}
+              className="text-sm text-red-500 hover:text-red-700"
+            >
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
+    </>
   )
 }
