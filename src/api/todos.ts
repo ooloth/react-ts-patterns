@@ -1,6 +1,7 @@
 import { DELAY_PRESETS } from '../domain/debug'
-import { TodoIdSchema, TodoSchema } from '../domain/schema'
+import { TodoIdSchema } from '../domain/schema'
 import type { RawTodo, Todo, TodoId } from '../domain/schema'
+import { toggleStatus } from '../domain/todos'
 
 const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
 
@@ -30,12 +31,6 @@ export async function fetchTodos(): Promise<RawTodo[]> {
   return store.map(todo => ({ ...todo }))
 }
 
-// Parses a single raw value. Returns the Todo on success, throws on invalid shape.
-// Used by call sites that have already retrieved raw data and need to validate it.
-export function parseTodo(raw: RawTodo): Todo {
-  return TodoSchema.parse(raw)
-}
-
 // Accepts a fully-formed Todo — the caller (client) is responsible for
 // generating id and createdAt. This lets the optimistic item and the real
 // item share the same key, so React reconciles them without a flicker.
@@ -51,7 +46,7 @@ export async function toggleTodo(id: TodoId, options: MutationOptions = DEFAULT_
   if (options.shouldFail) throw new Error('Simulated failure')
   store = store.map(todo =>
     todo.id === id
-      ? { ...todo, status: todo.status === 'active' ? 'completed' : 'active' } satisfies Todo
+      ? { ...todo, status: toggleStatus(todo.status) } satisfies Todo
       : todo
   )
   const updated = store.find(todo => todo.id === id)

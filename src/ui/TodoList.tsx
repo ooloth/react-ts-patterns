@@ -1,6 +1,7 @@
 import { startTransition, use, useOptimistic } from 'react'
 import { toast } from 'sonner'
-import { deleteTodo, parseTodo, toggleTodo } from '../api/todos'
+import { deleteTodo, toggleTodo } from '../api/todos'
+import { applyOptimistic, parseTodo } from '../domain/todos'
 import type { RawTodo, Todo, TodoId } from '../domain/schema'
 import { AddTodoForm } from './AddTodoForm'
 import { useMutationOptions } from './useMutationOptions'
@@ -8,26 +9,6 @@ import { useMutationOptions } from './useMutationOptions'
 type Props = {
   todosPromise: Promise<RawTodo[]>
   onMutate: () => void
-}
-
-type OptimisticAction =
-  | { type: 'add'; todo: Todo }
-  | { type: 'toggle'; id: TodoId }
-  | { type: 'delete'; id: TodoId }
-
-function applyOptimistic(todos: Todo[], action: OptimisticAction): Todo[] {
-  switch (action.type) {
-    case 'add':
-      return [...todos, action.todo]
-    case 'toggle':
-      return todos.map(t =>
-        t.id === action.id
-          ? { ...t, status: t.status === 'active' ? 'completed' : 'active' }
-          : t
-      )
-    case 'delete':
-      return todos.filter(t => t.id !== action.id)
-  }
 }
 
 export function TodoList({ todosPromise, onMutate }: Props) {
