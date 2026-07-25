@@ -10,3 +10,13 @@ export type TodoId = z.infer<typeof TodoIdSchema>
 // and self-documenting at call sites.
 export const TodoStatusSchema = z.enum(['active', 'completed'])
 export type TodoStatus = z.infer<typeof TodoStatusSchema>
+
+// The core domain entity. Readonly enforces immutability — mutations return
+// new objects rather than modifying in place.
+export const TodoSchema = z.object({
+  id: TodoIdSchema,
+  title: z.string().min(1),
+  status: TodoStatusSchema,
+  createdAt: z.string().datetime(),
+})
+export type Todo = Readonly<z.infer<typeof TodoSchema>>
