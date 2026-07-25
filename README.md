@@ -1,6 +1,9 @@
 # React 19 + TypeScript playground
 
-A todo app built to explore modern React 19 APIs and TypeScript best practices.
+A todo app (load, add, toggle, delete — with simulated async latency) built to explore why
+`useEffect` + `useState` is no longer the default for data fetching and mutations, how Suspense
+changes the mental model, what `useActionState`, `useFormStatus`, and `useOptimistic` each solve,
+and how the React Compiler changes the memoization conversation.
 
 ## Setup
 
@@ -8,6 +11,28 @@ A todo app built to explore modern React 19 APIs and TypeScript best practices.
 npm install
 npm run dev
 ```
+
+## Structure
+
+```
+src/
+  domain/   # Zod schemas and derived types — no React, no I/O
+  api/      # mock async functions — imports from domain/, simulates network delays
+  ui/       # React components — imports from both
+```
+
+Dependency direction: `domain` ← `api` ← `ui`. Nothing in `domain/` imports from `api/` or `ui/`.
+
+## Domain vocabulary
+
+| Name | What it represents |
+|---|---|
+| `Todo` | A todo item — `Readonly<z.infer<typeof TodoSchema>>` |
+| `TodoId` | Branded string — the type system rejects a plain `string` where a validated ID is required |
+| `TodoStatus` | `'active' \| 'completed'` — derived from a Zod enum |
+| `CreateTodoInput` | The fields required to create a todo — derived via `TodoSchema.omit()` |
+| `RawTodo` | `unknown` — what the mock API returns before parsing; callers must validate before use |
+| `RemoteData<T>` | Generic async state: `idle \| loading \| success \| error` — a named pattern worth knowing |
 
 ## React 19
 
@@ -24,6 +49,10 @@ npm run dev
 | `startTransition` (async) | React 19 extended `startTransition` to accept async functions — toggle and delete use this to sequence the optimistic update, server call, and re-fetch inside a single transition |
 | `<Context value={...}>` | `App` provides `DebugContext` with React 19's shorthand — no `.Provider` needed |
 | Suspense + ErrorBoundary | `App` wraps `TodoList` in both; `react-error-boundary` supplies the `ErrorBoundary` component |
+| `eslint-plugin-react-compiler` | Errors on Rules of React violations that cause the compiler to bail out on a component and skip automatic memoization |
+| `eslint-plugin-react-hooks` | Enforces the rules of hooks (call order, exhaustive deps) |
+| `eslint-plugin-react-x` | Enforces broader React correctness rules beyond hooks |
+| `eslint-plugin-react-dom` | Enforces React DOM-specific best practices |
 
 ## TypeScript
 
@@ -36,3 +65,15 @@ npm run dev
 | `Readonly<>` | `Todo` is `Readonly<z.infer<typeof TodoSchema>>` — mutations must replace the object, never mutate it in place |
 | `z.enum()` | `TodoStatus` is derived from a Zod enum so the schema and the type stay in sync |
 | `TodoSchema.omit()` | `CreateTodoInput` is derived structurally — no manual duplication of fields |
+
+## Design notes
+
+**`applyOptimistic` as a pure function** — any logic of the shape `(state, action) → newState`
+belongs outside components as a plain function. `applyOptimistic` follows this pattern: it is
+independently testable without React and keeps `TodoList` thin. A natural extension would be to
+move all such reducers into `domain/` and unit-test them there.
+
+**Implicit finite state machines** — `ActionState` in `AddTodoForm` and `RemoteData<T>` are both
+implicit FSMs: a fixed set of states with defined transitions. For more complex UI, making these
+explicit (e.g. with XState or a typed reducer) prevents impossible states at the component level,
+not just the type level.
