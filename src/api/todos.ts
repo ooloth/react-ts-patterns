@@ -1,5 +1,5 @@
 import { TodoIdSchema, TodoSchema } from '../domain/schema'
-import type { RawTodo, Todo } from '../domain/schema'
+import type { CreateTodoInput, RawTodo, Todo, TodoId } from '../domain/schema'
 
 const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
 
@@ -23,4 +23,35 @@ export async function fetchTodos(): Promise<RawTodo[]> {
 // Used by call sites that have already retrieved raw data and need to validate it.
 export function parseTodo(raw: RawTodo): Todo {
   return TodoSchema.parse(raw)
+}
+
+export async function addTodo(input: CreateTodoInput): Promise<RawTodo> {
+  await delay(400)
+  const todo: Todo = {
+    // crypto.randomUUID() is available in all modern browsers and Node 19+
+    id: TodoIdSchema.parse(crypto.randomUUID()),
+    title: input.title,
+    status: input.status,
+    createdAt: new Date().toISOString(),
+  }
+  store = [...store, todo]
+  return { ...todo }
+}
+
+// Returns the updated todo so callers can reconcile optimistic state.
+export async function toggleTodo(id: TodoId): Promise<RawTodo> {
+  await delay(300)
+  store = store.map(todo =>
+    todo.id === id
+      ? { ...todo, status: todo.status === 'active' ? 'completed' : 'active' } satisfies Todo
+      : todo
+  )
+  const updated = store.find(todo => todo.id === id)
+  if (!updated) throw new Error(`Todo ${id} not found`)
+  return { ...updated }
+}
+
+export async function deleteTodo(id: TodoId): Promise<void> {
+  await delay(300)
+  store = store.filter(todo => todo.id !== id)
 }
