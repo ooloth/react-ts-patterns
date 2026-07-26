@@ -1,9 +1,39 @@
 # React 19 + TypeScript playground
 
-A todo app (load, add, toggle, delete — with simulated async latency) built as a playground to
-explore React and TypeScript patterns. For example, fetching data on the client via Suspense +
-`use(promise)` instead of `useEffect` + `useState` what problems `useActionState`, `useFormStatus` and
-`useOptimistic` each solve, and how the React Compiler helps handle memoization automatically.
+A todo app (load, add, toggle, delete — with simulated async latency) built as a reference for
+the React 19 and TypeScript patterns that replace older defaults. The goal: demonstrate what to
+reach for *now* — and what to stop reaching for — so that previously-recommended patterns don't
+persist by habit.
+
+## What these patterns replace
+
+If you last focused on React or TypeScript before 2024, these are the habits this repo is
+designed to update:
+
+**React**
+
+| Old habit | Modern replacement |
+| --------- | ------------------ |
+| `useEffect(() => { fetch(…).then(setData) }, [])` | `use(promise)` + Suspense |
+| Per-component `if (loading) return …` / `if (error) return …` | Suspense + ErrorBoundary — declare fallbacks once at the tree level |
+| `React.memo`, `useMemo`, `useCallback` everywhere | React Compiler — memoization is automatic; writing it manually is no longer the default |
+| `forwardRef((props, ref) => …)` | `ref` as a plain prop |
+| `useContext(MyContext)` | `use(MyContext)` — also callable conditionally |
+| `<MyContext.Provider value={…}>` | `<MyContext value={…}>` |
+| `useState` + `e.preventDefault()` + manual `isSubmitting`/`error` state | `useActionState` + `<form action={fn}>` |
+| Prop-drilling `isSubmitting` to the submit button | `useFormStatus` in a descendant component |
+| Manual optimistic state + rollback logic | `useOptimistic` |
+| `useEffect` + `setTimeout` debounce on inputs | `useDeferredValue` |
+
+**TypeScript**
+
+| Old habit | Modern replacement |
+| --------- | ------------------ |
+| Hand-written interfaces duplicating a Zod (or similar) schema | `z.infer<typeof Schema>` — one source of truth |
+| `string` annotated with a comment ("must be a valid ID") | Branded types — the type system enforces it |
+| `: MyType` (loses literals) or `as const` (loses shape check) | `satisfies MyType` — keeps literal types and enforces shape |
+| `type Status = 'active' \| 'completed'` with a separate validation step | `z.enum(['active', 'completed'])` — schema and type stay in sync |
+| Boolean flags (`isLoading`, `isError`, `data`) with impossible combinations | Discriminated unions — impossible states become unrepresentable |
 
 ## Setup
 
