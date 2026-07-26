@@ -1,4 +1,4 @@
-import { useActionState, useState } from 'react'
+import { useActionState, useId, useState } from 'react'
 import { useFormStatus } from 'react-dom'
 import type { Ref } from 'react'
 import { toast } from 'sonner'
@@ -32,6 +32,8 @@ function SubmitButton({ label, disabled = false }: { label: string; disabled?: b
 }
 
 export function AddTodoForm({ ref, onAdd, onMutate }: Props) {
+  // useId: stable unique ID per instance — correct when the component is reused or SSR'd.
+  const inputId = useId()
   const [title, setTitle] = useState('')
   const { mutationOptions, setFailNext } = useMutationOptions()
 
@@ -60,8 +62,10 @@ export function AddTodoForm({ ref, onAdd, onMutate }: Props) {
     // onSubmit fires synchronously on submit; action runs async after.
     // Clearing title here gives optimistic input reset before the await.
     <form action={formAction} onSubmit={() => setTitle('')} className="mt-6 flex gap-2">
+      <label htmlFor={inputId} className="sr-only">New todo</label>
       <input
         ref={ref}
+        id={inputId}
         name="title"
         type="text"
         value={title}

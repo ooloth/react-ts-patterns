@@ -1,4 +1,4 @@
-import { startTransition, use, useDeferredValue, useOptimistic, useRef, useState } from 'react'
+import { startTransition, use, useDeferredValue, useId, useOptimistic, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { deleteTodo, toggleTodo } from './store'
 import type { TodosPromise } from './store'
@@ -20,6 +20,8 @@ export function TodoList({ todosPromise, onMutate }: Props) {
   const { mutationOptions, setFailNext } = useMutationOptions()
   const inputRef = useRef<HTMLInputElement>(null)
   const toggleControllerRef = useRef<AbortController | null>(null)
+  // useId: stable unique ID per instance — correct when the component is reused or SSR'd.
+  const filterId = useId()
   const [query, setQuery] = useState('')
   // useDeferredValue keeps the input responsive by letting React deprioritize
   // the filtered-list re-render when it can't keep up with fast typing.
@@ -73,7 +75,9 @@ export function TodoList({ todosPromise, onMutate }: Props) {
 
   return (
     <>
+      <label htmlFor={filterId} className="sr-only">Filter todos</label>
       <input
+        id={filterId}
         type="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
