@@ -25,6 +25,7 @@ export function TodoList({ todosPromise, onMutate }: Props) {
   // the filtered-list re-render when it can't keep up with fast typing.
   const deferredQuery = useDeferredValue(query)
   const isPending = query !== deferredQuery
+  // React Compiler: no useMemo — derived values like this are memoized automatically.
   const visible = filterTodos(optimisticTodos, deferredQuery)
 
   const handleAdd = (todo: Todo) => {

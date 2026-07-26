@@ -14,6 +14,8 @@ export default function App() {
   const [delayPreset, setDelayPreset] = useState<DelayPreset>('instant')
   const [failNext, setFailNext] = useState(false)
 
+  // React Compiler: no useCallback here, no React.memo on TodoList — the compiler
+  // memoizes callbacks and components automatically, so neither is needed.
   const refresh = () =>
     startTransition(() => setTodosPromise(fetchTodos(DELAY_PRESETS[delayPreset])))
 
