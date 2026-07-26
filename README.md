@@ -54,6 +54,23 @@ src/
 
 Pure files (`schema.ts`, `state-transitions.ts`, `parse.ts`, `filter.ts`, `debug/config.ts`) import nothing from the project and have no side effects. `store.ts` and components may import from them. `debug/context.ts` is the only file that imports React outside of component files.
 
+## Testing
+
+Two layers, no React Testing Library:
+
+- **Unit tests** (`npm test`) cover the pure domain functions — `parse`, `filter`, and
+  `state-transitions`. These have no React dependency and are cheapest to test at the module
+  level. Fixtures use `Object.freeze` to catch accidental mutation in functions that should
+  return new arrays.
+- **End-to-end tests** (`npm run test:e2e`) cover UI behaviour in a real Chromium browser via
+  Playwright — adds, toggles, deletes, filtering, optimistic updates, and rollback on simulated
+  server failure.
+
+RTL component tests aren't used here. Anything worth testing in a component is either domain
+logic (better tested as a pure function) or UI behaviour (better tested end-to-end in a real
+browser). The component layer in between adds jsdom overhead, couples tests to implementation
+details, and tends to duplicate what the other two layers already cover.
+
 ## Domain vocabulary
 
 | Name              | What it represents                                                                         |
