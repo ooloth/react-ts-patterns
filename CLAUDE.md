@@ -33,3 +33,8 @@ outcomes via the best available React + TS patterns.
 - I may have outdated habits and am genuinely interested in updating my skills
 - UX always trumps React and TS; if showing off a particular pattern or achieving a cleaner code
   boundary would force a worse user experience, we do NOT want to do it; help ensure we don't
+
+## Things to check
+
+- Does the current change invalidate the README?
+- Does the current change add something the README doesn't mention but should?
