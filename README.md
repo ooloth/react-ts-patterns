@@ -2,7 +2,7 @@
 
 A todo app (load, add, toggle, delete — with simulated async latency) built as a reference for
 the React 19 and TypeScript patterns that replace older defaults. The goal: demonstrate what to
-reach for *now* — and what to stop reaching for — so that previously-recommended patterns don't
+reach for _now_ — and what to stop reaching for — so that previously-recommended patterns don't
 persist by habit.
 
 ## What these patterns replace
@@ -12,28 +12,28 @@ designed to update:
 
 **React**
 
-| Old habit | Modern replacement |
-| --------- | ------------------ |
-| `useEffect(() => { fetch(…).then(setData) }, [])` | `use(promise)` + Suspense |
-| Per-component `if (loading) return …` / `if (error) return …` | Suspense + ErrorBoundary — declare fallbacks once at the tree level |
-| `React.memo`, `useMemo`, `useCallback` everywhere | React Compiler — memoization is automatic; writing it manually is no longer the default |
-| `forwardRef((props, ref) => …)` | `ref` as a plain prop |
-| `useContext(MyContext)` | `use(MyContext)` — also callable conditionally |
-| `<MyContext.Provider value={…}>` | `<MyContext value={…}>` |
-| `useState` + `e.preventDefault()` + manual `isSubmitting`/`error` state | `useActionState` + `<form action={fn}>` |
-| Prop-drilling `isSubmitting` to the submit button | `useFormStatus` in a descendant component |
-| Manual optimistic state + rollback logic | `useOptimistic` |
-| `useEffect` + `setTimeout` debounce on inputs | `useDeferredValue` |
+| Old habit                                                               | Modern replacement                                                                      |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `useEffect(() => { fetch(…).then(setData) }, [])`                       | `use(promise)` + Suspense                                                               |
+| Per-component `if (loading) return …` / `if (error) return …`           | Suspense + ErrorBoundary — declare fallbacks once at the tree level                     |
+| `React.memo`, `useMemo`, `useCallback` everywhere                       | React Compiler — memoization is automatic; writing it manually is no longer the default |
+| `forwardRef((props, ref) => …)`                                         | `ref` as a plain prop                                                                   |
+| `useContext(MyContext)`                                                 | `use(MyContext)` — also callable conditionally                                          |
+| `<MyContext.Provider value={…}>`                                        | `<MyContext value={…}>`                                                                 |
+| `useState` + `e.preventDefault()` + manual `isSubmitting`/`error` state | `useActionState` + `<form action={fn}>`                                                 |
+| Prop-drilling `isSubmitting` to the submit button                       | `useFormStatus` in a descendant component                                               |
+| Manual optimistic state + rollback logic                                | `useOptimistic`                                                                         |
+| `useEffect` + `setTimeout` debounce on inputs                           | `useDeferredValue`                                                                      |
 
 **TypeScript**
 
-| Old habit | Modern replacement |
-| --------- | ------------------ |
-| Hand-written interfaces duplicating a Zod (or similar) schema | `z.infer<typeof Schema>` — one source of truth |
-| `string` annotated with a comment ("must be a valid ID") | Branded types — the type system enforces it |
-| `: MyType` (loses literals) or `as const` (loses shape check) | `satisfies MyType` — keeps literal types and enforces shape |
-| `type Status = 'active' \| 'completed'` with a separate validation step | `z.enum(['active', 'completed'])` — schema and type stay in sync |
-| Boolean flags (`isLoading`, `isError`, `data`) with impossible combinations | Discriminated unions — impossible states become unrepresentable |
+| Old habit                                                                   | Modern replacement                                               |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Hand-written interfaces duplicating a Zod (or similar) schema               | `z.infer<typeof Schema>` — one source of truth                   |
+| `string` annotated with a comment ("must be a valid ID")                    | Branded types — the type system enforces it                      |
+| `: MyType` (loses literals) or `as const` (loses shape check)               | `satisfies MyType` — keeps literal types and enforces shape      |
+| `type Status = 'active' \| 'completed'` with a separate validation step     | `z.enum(['active', 'completed'])` — schema and type stay in sync |
+| Boolean flags (`isLoading`, `isError`, `data`) with impossible combinations | Discriminated unions — impossible states become unrepresentable  |
 
 ## Setup
 
@@ -111,7 +111,7 @@ details, and tends to duplicate what the other two layers already cover.
 | `z.infer<>`          | All types (`Todo`, `TodoId`, `TodoStatus`, etc.) are derived from Zod schemas — never written by hand                                                                                                                              |
 | Branded types        | `TodoId = z.string().brand<'TodoId'>()` — the type system rejects a plain `string` where a validated ID is required                                                                                                                |
 | `satisfies`          | `DELAY_PRESETS satisfies Record<string, number>` preserves the literal key types (`'instant' \| 'normal' \| 'slow'`) while enforcing the value shape; also used in `toggleTodo` to assert the spread object still satisfies `Todo` |
-| Discriminated unions | `OptimisticAction` (`add` / `toggle` / `delete`) exhaustively switches on `type`                                                                                                                                                    |
+| Discriminated unions | `OptimisticAction` (`add` / `toggle` / `delete`) exhaustively switches on `type`                                                                                                                                                   |
 | `Readonly<>`         | `Todo` is `Readonly<z.infer<typeof TodoSchema>>` — mutations must replace the object, never mutate it in place                                                                                                                     |
 | `z.enum()`           | `TodoStatus` is derived from a Zod enum so the schema and the type stay in sync                                                                                                                                                    |
 | `TodoSchema.omit()`  | `CreateTodoInput` is derived structurally — no manual duplication of fields                                                                                                                                                        |
@@ -119,8 +119,11 @@ details, and tends to duplicate what the other two layers already cover.
 
 ## Todos 😉
 
-- Move all `(state, action) → newState` reducers into `domain/` and unit-test them there —
-  `applyOptimistic` already follows this shape; the rest of the mutation logic could too
-- Make the implicit FSMs explicit with XState or a typed reducer — `ActionState` in `AddTodoForm`
-  has a fixed state set with defined transitions; an explicit machine would prevent impossible
-  states at the component level, not just the type level
+- [ ] Improve styling
+- [ ] Optimize a11y (e.g. screen reader users, keyboard users, color contrast, etc)
+- [ ] Optimize UX (e.g. intuitive journeys, optimistic updates, more/fewer animations)
+- [ ] Move all `(state, action) → newState` reducers into `domain/` and unit-test them there —
+      `applyOptimistic` already follows this shape; the rest of the mutation logic could too
+- [ ] Make the implicit FSMs explicit with XState or a typed reducer — `ActionState` in `AddTodoForm`
+      has a fixed state set with defined transitions; an explicit machine would prevent impossible
+      states at the component level, not just the type level
