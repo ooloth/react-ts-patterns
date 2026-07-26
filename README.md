@@ -24,7 +24,7 @@ designed to update:
 | Prop-drilling `isSubmitting` to the submit button                       | `useFormStatus` in a descendant component                                               |
 | Manual optimistic state + rollback logic                                | `useOptimistic`                                                                         |
 | `useEffect` + `setTimeout` debounce on inputs                           | `useDeferredValue`                                                                      |
-| Hardcoded `id="my-input"` strings                                        | `useId()` — unique per instance, safe across SSR/hydration                              |
+| Hardcoded `id="my-input"` strings                                       | `useId()` — unique per instance, safe across SSR/hydration                              |
 
 **TypeScript**
 
@@ -35,6 +35,8 @@ designed to update:
 | `: MyType` (loses literals) or `as const` (loses shape check)               | `satisfies MyType` — keeps literal types and enforces shape      |
 | `type Status = 'active' \| 'completed'` with a separate validation step     | `z.enum(['active', 'completed'])` — schema and type stay in sync |
 | Boolean flags (`isLoading`, `isError`, `data`) with impossible combinations | Discriminated unions — impossible states become unrepresentable  |
+| `const enum`, legacy decorators, namespace merges                           | `erasableSyntaxOnly: true` — bans syntax that can't be type-stripped |
+| `import Foo from './foo'` for types, relying on `isolatedModules` to catch it | `verbatimModuleSyntax: true` — enforces `import type` at the syntax level |
 
 ## Setup
 
@@ -118,12 +120,15 @@ details, and tends to duplicate what the other two layers already cover.
 | `z.enum()`           | `TodoStatus` is derived from a Zod enum so the schema and the type stay in sync                                                                                                                                                    |
 | `TodoSchema.omit()`  | `CreateTodoInput` is derived structurally — no manual duplication of fields                                                                                                                                                        |
 | `ReturnType<>`       | `TodosPromise = ReturnType<typeof fetchTodos>` — the prop and state types stay in sync with the function signature automatically                                                                                                   |
+| `erasableSyntaxOnly` | Tsconfig flag that bans TypeScript syntax requiring transformation rather than simple type-stripping (`const enum`, legacy decorators, namespace merges) — keeps code compatible with tools that strip types without compiling (Node, Vite, esbuild) |
+| `verbatimModuleSyntax` | Tsconfig flag that requires `import type` for type-only imports and `export type` for type-only exports — prevents accidental value imports that bloat bundles and cause runtime errors in ESM                                  |
 
 ## Todos 😉
 
 - [ ] Improve styling
 - [ ] Optimize a11y (e.g. screen reader users, keyboard users, color contrast, etc)
 - [ ] Optimize UX (e.g. intuitive journeys, optimistic updates, more/fewer animations)
+- [ ] Express code boundaries more effectively via folder/file organization
 - [ ] Move all `(state, action) → newState` reducers into `domain/` and unit-test them there —
       `applyOptimistic` already follows this shape; the rest of the mutation logic could too
 - [ ] Make the implicit FSMs explicit with XState or a typed reducer — `ActionState` in `AddTodoForm`
