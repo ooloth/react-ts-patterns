@@ -63,7 +63,6 @@ Pure files (`schema.ts`, `state-transitions.ts`, `parse.ts`, `filter.ts`, `debug
 | `TodoStatus`      | `'active' \| 'completed'` — derived from a Zod enum                                        |
 | `CreateTodoInput` | The fields required to create a todo — derived via `TodoSchema.omit()`                     |
 | `RawTodo`         | `unknown` — what the mock API returns before parsing; callers must validate before use     |
-| `RemoteData<T>`   | Generic async state: `idle \| loading \| success \| error` — a named pattern worth knowing |
 
 ## React 19
 
@@ -95,7 +94,7 @@ Pure files (`schema.ts`, `state-transitions.ts`, `parse.ts`, `filter.ts`, `debug
 | `z.infer<>`          | All types (`Todo`, `TodoId`, `TodoStatus`, etc.) are derived from Zod schemas — never written by hand                                                                                                                              |
 | Branded types        | `TodoId = z.string().brand<'TodoId'>()` — the type system rejects a plain `string` where a validated ID is required                                                                                                                |
 | `satisfies`          | `DELAY_PRESETS satisfies Record<string, number>` preserves the literal key types (`'instant' \| 'normal' \| 'slow'`) while enforcing the value shape; also used in `toggleTodo` to assert the spread object still satisfies `Todo` |
-| Discriminated unions | `OptimisticAction` (`add` / `toggle` / `delete`) and `RemoteData<T>` (`idle` / `loading` / `success` / `error`) each exhaustively switch on `type` / `status`                                                                      |
+| Discriminated unions | `OptimisticAction` (`add` / `toggle` / `delete`) exhaustively switches on `type`                                                                                                                                                    |
 | `Readonly<>`         | `Todo` is `Readonly<z.infer<typeof TodoSchema>>` — mutations must replace the object, never mutate it in place                                                                                                                     |
 | `z.enum()`           | `TodoStatus` is derived from a Zod enum so the schema and the type stay in sync                                                                                                                                                    |
 | `TodoSchema.omit()`  | `CreateTodoInput` is derived structurally — no manual duplication of fields                                                                                                                                                        |
@@ -106,5 +105,5 @@ Pure files (`schema.ts`, `state-transitions.ts`, `parse.ts`, `filter.ts`, `debug
 - Move all `(state, action) → newState` reducers into `domain/` and unit-test them there —
   `applyOptimistic` already follows this shape; the rest of the mutation logic could too
 - Make the implicit FSMs explicit with XState or a typed reducer — `ActionState` in `AddTodoForm`
-  and `RemoteData<T>` both have a fixed state set with defined transitions; explicit machines
-  prevent impossible states at the component level, not just the type level
+  has a fixed state set with defined transitions; an explicit machine would prevent impossible
+  states at the component level, not just the type level
