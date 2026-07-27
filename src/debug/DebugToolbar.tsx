@@ -23,6 +23,7 @@ export function DebugToolbar() {
           <button
             key={preset}
             onClick={() => setDelayPreset(preset)}
+            aria-pressed={delayPreset === preset}
             className={`rounded px-2 py-0.5 ${delayPreset === preset ? 'bg-blue-100 text-blue-700 font-medium' : 'hover:bg-gray-200'}`}
           >
             {PRESET_LABELS[preset]}

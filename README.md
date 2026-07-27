@@ -132,6 +132,7 @@ details, and tends to duplicate what the other two layers already cover.
 | `aria-label` | Delete buttons use `aria-label={`Delete ${todo.title}`}` — visible text stays "Delete" while screen readers announce the item context ("Delete Buy milk") |
 | Focus management | After a todo is deleted, focus moves to the next item's checkbox (or the previous if it was last, or the add input if the list empties) — prevents focus dropping to `<body>` and losing the keyboard user's place |
 | `role="alert"` | The error boundary fallback carries `role="alert"` — screen readers announce it immediately when it appears, without requiring the user to navigate to it |
+| `aria-pressed` | The delay preset buttons in the debug toolbar use `aria-pressed={delayPreset === preset}` — the active selection is communicated to screen readers, not just visually highlighted |
 
 ## Todos 😉
 
