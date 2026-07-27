@@ -5,8 +5,9 @@ dist-ssr/
 *.log
 
 # Playwright
-test-results/
+.playwright-mcp/
 playwright-report/
+test-results/
 
 # macOS
 .DS_Store
