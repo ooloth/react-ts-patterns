@@ -152,6 +152,10 @@ details, and tends to duplicate what the other two layers already cover.
         (corner-anchored) that expands on hover or click — keeps the tool accessible without
         visually anchoring a dev-only bar to the bottom of every screen
   - [ ] **Keyboard shortcuts**: for everything
+- [ ] Optimize React usage
+  - [ ] **Server components**: would the implementation benefit from them? how to include via vite?
+        via React Router 7? worth switching away from vite to enable RSCs? best approach that
+        enables RSCs + the compiler?
 - [ ] Express code boundaries more effectively via folder/file organization
 - [ ] Move all `(state, action) → newState` reducers into `domain/` and unit-test them there —
       `applyOptimistic` already follows this shape; the rest of the mutation logic could too
