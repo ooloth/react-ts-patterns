@@ -101,7 +101,7 @@ export function TodoList({ todosPromise, onMutate }: Props) {
         className="mt-6 w-full rounded border border-gray-300 px-3 py-2 text-sm"
       />
       <AddTodoForm ref={inputRef} onAdd={handleAdd} onMutate={onMutate} />
-      <ul className={`mt-4 divide-y divide-gray-200 ${isPending ? 'opacity-50' : ''}`}>
+      <ul aria-busy={isPending} className={`mt-4 divide-y divide-gray-200 ${isPending ? 'opacity-50' : ''}`}>
         {visible.map((todo) => (
           <li key={todo.id} className="flex items-center gap-3 py-3">
             <input

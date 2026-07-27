@@ -133,6 +133,7 @@ details, and tends to duplicate what the other two layers already cover.
 | Focus management | After a todo is deleted, focus moves to the next item's checkbox (or the previous if it was last, or the add input if the list empties) — prevents focus dropping to `<body>` and losing the keyboard user's place |
 | `role="alert"` | The error boundary fallback carries `role="alert"` — screen readers announce it immediately when it appears, without requiring the user to navigate to it |
 | `aria-pressed` | The delay preset buttons in the debug toolbar use `aria-pressed={delayPreset === preset}` — the active selection is communicated to screen readers, not just visually highlighted |
+| `aria-busy` | The todo list sets `aria-busy={isPending}` while `useDeferredValue` is catching up — mirrors the `opacity-50` visual hint for screen readers |
 
 ## Todos 😉
 
