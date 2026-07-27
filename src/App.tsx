@@ -24,8 +24,10 @@ export default function App() {
   return (
     <DebugContext value={{ delayPreset, failNext, setDelayPreset, setFailNext }}>
       <main className="mx-auto max-w-xl p-8 pb-16">
-        <h1 className="text-xl font-semibold text-text">Todos</h1>
-        <p className="mt-1 text-sm text-muted">Playground for trying out modern React and TypeScript idioms.</p>
+        <h1 className="text-3xl font-semibold text-text">Todos</h1>
+        <p className="mt-1 text-sm text-muted">
+          Playground for trying out the latest React, TypeScript and UX patterns.
+        </p>
         <ErrorBoundary
           fallbackRender={({ error }) => (
             <p role="alert" className="mt-4 text-danger">
