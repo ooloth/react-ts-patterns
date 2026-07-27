@@ -89,18 +89,21 @@ export function TodoList({ todosPromise, onMutate }: Props) {
         {visible.map((todo) => (
           <li key={todo.id} className="flex items-center gap-3 py-3">
             <input
+              id={`todo-${todo.id}`}
               type="checkbox"
               checked={todo.status === 'completed'}
               onChange={() => handleToggle(todo.id)}
               className="h-4 w-4 cursor-pointer"
             />
-            <span
-              className={`flex-1 ${todo.status === 'completed' ? 'line-through text-gray-400' : ''}`}
+            <label
+              htmlFor={`todo-${todo.id}`}
+              className={`flex-1 cursor-pointer ${todo.status === 'completed' ? 'line-through text-gray-400' : ''}`}
             >
               {todo.title}
-            </span>
+            </label>
             <button
               onClick={() => handleDelete(todo.id)}
+              aria-label={`Delete ${todo.title}`}
               className="text-sm text-red-500 hover:text-red-700"
             >
               Delete

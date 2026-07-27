@@ -1,14 +1,15 @@
 # React 19 + TypeScript playground
 
-A todo app (load, add, toggle, delete — with simulated async latency) built as a reference for
-the React 19 and TypeScript patterns that replace older defaults. The goal: demonstrate what to
-reach for _now_ — and what to stop reaching for — so that previously-recommended patterns don't
-persist by habit.
+A todo app (load, add, toggle, delete — with simulated async latency) built as a playground for
+demonstrating modern React 19, TypeScript and UX patterns, where UX includes accessibility, styling,
+animations, layout - everything that leads to an intuitive user experience. The goal is to
+demonstrate what patterns to reach for today (and what to stop reaching for) so
+previously-recommended patterns don't persist by habit.
 
 ## What these patterns replace
 
-If you last focused on React or TypeScript before 2024, these are the habits this repo is
-designed to update:
+If you last focused on React or TypeScript before 2024, these are the habits this repo is designed
+to update:
 
 **React**
 
@@ -28,14 +29,14 @@ designed to update:
 
 **TypeScript**
 
-| Old habit                                                                   | Modern replacement                                               |
-| --------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| Hand-written interfaces duplicating a Zod (or similar) schema               | `z.infer<typeof Schema>` — one source of truth                   |
-| `string` annotated with a comment ("must be a valid ID")                    | Branded types — the type system enforces it                      |
-| `: MyType` (loses literals) or `as const` (loses shape check)               | `satisfies MyType` — keeps literal types and enforces shape      |
-| `type Status = 'active' \| 'completed'` with a separate validation step     | `z.enum(['active', 'completed'])` — schema and type stay in sync |
-| Boolean flags (`isLoading`, `isError`, `data`) with impossible combinations | Discriminated unions — impossible states become unrepresentable  |
-| `const enum`, legacy decorators, namespace merges                           | `erasableSyntaxOnly: true` — bans syntax that can't be type-stripped |
+| Old habit                                                                     | Modern replacement                                                        |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Hand-written interfaces duplicating a Zod (or similar) schema                 | `z.infer<typeof Schema>` — one source of truth                            |
+| `string` annotated with a comment ("must be a valid ID")                      | Branded types — the type system enforces it                               |
+| `: MyType` (loses literals) or `as const` (loses shape check)                 | `satisfies MyType` — keeps literal types and enforces shape               |
+| `type Status = 'active' \| 'completed'` with a separate validation step       | `z.enum(['active', 'completed'])` — schema and type stay in sync          |
+| Boolean flags (`isLoading`, `isError`, `data`) with impossible combinations   | Discriminated unions — impossible states become unrepresentable           |
+| `const enum`, legacy decorators, namespace merges                             | `erasableSyntaxOnly: true` — bans syntax that can't be type-stripped      |
 | `import Foo from './foo'` for types, relying on `isolatedModules` to catch it | `verbatimModuleSyntax: true` — enforces `import type` at the syntax level |
 
 ## Setup
@@ -110,18 +111,25 @@ details, and tends to duplicate what the other two layers already cover.
 
 ## TypeScript
 
-| Pattern              | How used                                                                                                                                                                                                                           |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `z.infer<>`          | All types (`Todo`, `TodoId`, `TodoStatus`, etc.) are derived from Zod schemas — never written by hand                                                                                                                              |
-| Branded types        | `TodoId = z.string().brand<'TodoId'>()` — the type system rejects a plain `string` where a validated ID is required                                                                                                                |
-| `satisfies`          | `DELAY_PRESETS satisfies Record<string, number>` preserves the literal key types (`'instant' \| 'normal' \| 'slow'`) while enforcing the value shape; also used in `toggleTodo` to assert the spread object still satisfies `Todo` |
-| Discriminated unions | `OptimisticAction` (`add` / `toggle` / `delete`) exhaustively switches on `type`                                                                                                                                                   |
-| `Readonly<>`         | `Todo` is `Readonly<z.infer<typeof TodoSchema>>` — mutations must replace the object, never mutate it in place                                                                                                                     |
-| `z.enum()`           | `TodoStatus` is derived from a Zod enum so the schema and the type stay in sync                                                                                                                                                    |
-| `TodoSchema.omit()`  | `CreateTodoInput` is derived structurally — no manual duplication of fields                                                                                                                                                        |
-| `ReturnType<>`       | `TodosPromise = ReturnType<typeof fetchTodos>` — the prop and state types stay in sync with the function signature automatically                                                                                                   |
-| `erasableSyntaxOnly` | Tsconfig flag that bans TypeScript syntax requiring transformation rather than simple type-stripping (`const enum`, legacy decorators, namespace merges) — keeps code compatible with tools that strip types without compiling (Node, Vite, esbuild) |
-| `verbatimModuleSyntax` | Tsconfig flag that requires `import type` for type-only imports and `export type` for type-only exports — prevents accidental value imports that bloat bundles and cause runtime errors in ESM                                  |
+| Pattern                | How used                                                                                                                                                                                                                                             |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `z.infer<>`            | All types (`Todo`, `TodoId`, `TodoStatus`, etc.) are derived from Zod schemas — never written by hand                                                                                                                                                |
+| Branded types          | `TodoId = z.string().brand<'TodoId'>()` — the type system rejects a plain `string` where a validated ID is required                                                                                                                                  |
+| `satisfies`            | `DELAY_PRESETS satisfies Record<string, number>` preserves the literal key types (`'instant' \| 'normal' \| 'slow'`) while enforcing the value shape; also used in `toggleTodo` to assert the spread object still satisfies `Todo`                   |
+| Discriminated unions   | `OptimisticAction` (`add` / `toggle` / `delete`) exhaustively switches on `type`                                                                                                                                                                     |
+| `Readonly<>`           | `Todo` is `Readonly<z.infer<typeof TodoSchema>>` — mutations must replace the object, never mutate it in place                                                                                                                                       |
+| `z.enum()`             | `TodoStatus` is derived from a Zod enum so the schema and the type stay in sync                                                                                                                                                                      |
+| `TodoSchema.omit()`    | `CreateTodoInput` is derived structurally — no manual duplication of fields                                                                                                                                                                          |
+| `ReturnType<>`         | `TodosPromise = ReturnType<typeof fetchTodos>` — the prop and state types stay in sync with the function signature automatically                                                                                                                     |
+| `erasableSyntaxOnly`   | Tsconfig flag that bans TypeScript syntax requiring transformation rather than simple type-stripping (`const enum`, legacy decorators, namespace merges) — keeps code compatible with tools that strip types without compiling (Node, Vite, esbuild) |
+| `verbatimModuleSyntax` | Tsconfig flag that requires `import type` for type-only imports and `export type` for type-only exports — prevents accidental value imports that bloat bundles and cause runtime errors in ESM                                                       |
+
+## Accessibility
+
+| Pattern | How used |
+| ------- | -------- |
+| `<label htmlFor>` | Each todo's title is a `<label>` linked to its checkbox via `htmlFor={`todo-${todo.id}`}` — clicking the title activates the checkbox; the ID is data-derived (from `todo.id`), contrasting with `useId` which generates instance-derived IDs |
+| `aria-label` | Delete buttons use `aria-label={`Delete ${todo.title}`}` — visible text stays "Delete" while screen readers announce the item context ("Delete Buy milk") |
 
 ## Todos 😉
 

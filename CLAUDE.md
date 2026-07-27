@@ -9,14 +9,15 @@ The primary purpose to demonstrate to myself and others the latest React, TS and
 for common use cases. A todo app was chosen because of it's simple, well understood domain that
 nevertheless creates the opportunity to implement loads of UI workflows.
 
-By focusing on the latest solutions available React, TS, HTML, CSS and the browser, my secondary
+By focusing on the latest solutions available in React, TS, HTML, CSS and the browser, my secondary
 goals is to update any old habits that would cause me to reach for previously recommended patterns
 (e.g. load data in a `useEffect`) when better patterns now exist for solving those problems (e.g.
 `Suspense` + `use(promise)` or a server component).
 
 While this should ideally feel like the best todo app you've ever touched, it is not in fact a bona
-fide todo app; it's a React + TS + UX patterns workshop. It's choices should achieve ideal UX
-outcomes via the best available React + TS patterns.
+fide todo app; it's a React + TS + UX patterns workshop. UX here includes a11y, styling, animations,
+layout - everything that contributes to an intuitive journey for every user. This project's choices
+should demonstration how to achieve ideal UX outcomes via the best available React + TS patterns.
 
 ## What to ask yourself as you work in this project?
 
