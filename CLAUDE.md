@@ -39,3 +39,7 @@ should demonstration how to achieve ideal UX outcomes via the best available Rea
 
 - Does the current change invalidate the README?
 - Does the current change add something the README doesn't mention but should?
+
+## Docs
+
+(add a lookup table for what docs to read when)
