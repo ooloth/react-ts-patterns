@@ -131,6 +131,7 @@ details, and tends to duplicate what the other two layers already cover.
 | `<label htmlFor>` | Each todo's title is a `<label>` linked to its checkbox via `htmlFor={`todo-${todo.id}`}` — clicking the title activates the checkbox; the ID is data-derived (from `todo.id`), contrasting with `useId` which generates instance-derived IDs |
 | `aria-label` | Delete buttons use `aria-label={`Delete ${todo.title}`}` — visible text stays "Delete" while screen readers announce the item context ("Delete Buy milk") |
 | Focus management | After a todo is deleted, focus moves to the next item's checkbox (or the previous if it was last, or the add input if the list empties) — prevents focus dropping to `<body>` and losing the keyboard user's place |
+| `role="alert"` | The error boundary fallback carries `role="alert"` — screen readers announce it immediately when it appears, without requiring the user to navigate to it |
 
 ## Todos 😉
 

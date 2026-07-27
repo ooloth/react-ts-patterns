@@ -28,7 +28,7 @@ export default function App() {
         <p>Playground for trying out modern React and TypeScript idioms.</p>
         <ErrorBoundary
           fallbackRender={({ error }) => (
-            <p className="mt-4 text-red-600">
+            <p role="alert" className="mt-4 text-red-600">
               Failed to load todos: {error instanceof Error ? error.message : String(error)}
             </p>
           )}
