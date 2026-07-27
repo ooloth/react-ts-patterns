@@ -1,4 +1,4 @@
-import { use } from 'react'
+import { use, useId } from 'react'
 import { DELAY_PRESETS } from './config'
 import type { DelayPreset } from './config'
 import { DebugContext } from './context'
@@ -13,12 +13,23 @@ export function DebugToolbar() {
   // use(context) — React 19 lets use() read context values, not just promises.
   // Unlike useContext, use() can be called conditionally.
   const { delayPreset, failNext, setDelayPreset, setFailNext } = use(DebugContext)
+  const titleId = useId()
+  const delayGroupId = useId()
 
   return (
-    <div className="fixed bottom-0 inset-x-0 border-t border-gray-200 bg-gray-50 px-4 py-2 flex items-center justify-center gap-6 text-xs text-gray-500">
-      <span className="font-medium text-gray-400 uppercase tracking-wide">Debug</span>
-      <div className="flex items-center gap-2">
-        <span>Delay:</span>
+    // <aside> makes the toolbar a complementary landmark — screen reader users
+    // can navigate to it by landmark. aria-labelledby links it to the visible
+    // "Debug" title rather than duplicating the name in an aria-label string.
+    <aside
+      aria-labelledby={titleId}
+      className="fixed bottom-0 inset-x-0 border-t border-gray-200 bg-gray-50 px-4 py-2 flex items-center justify-center gap-6 text-xs text-gray-500"
+    >
+      <span id={titleId} className="font-medium text-gray-400 uppercase tracking-wide">Debug</span>
+      {/* role="group" + aria-labelledby is preferred over <fieldset>/<legend> here:
+          these are action buttons (not form controls), and <fieldset> carries default
+          browser styles that require resetting. */}
+      <div role="group" aria-labelledby={delayGroupId} className="flex items-center gap-2">
+        <span id={delayGroupId}>Delay:</span>
         {(Object.keys(DELAY_PRESETS) as DelayPreset[]).map((preset) => (
           <button
             key={preset}
@@ -39,6 +50,6 @@ export function DebugToolbar() {
         />
         Fail next request
       </label>
-    </div>
+    </aside>
   )
 }

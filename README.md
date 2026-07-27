@@ -135,6 +135,8 @@ details, and tends to duplicate what the other two layers already cover.
 | `aria-pressed` | The delay preset buttons in the debug toolbar use `aria-pressed={delayPreset === preset}` — the active selection is communicated to screen readers, not just visually highlighted |
 | `aria-busy` | The todo list sets `aria-busy={isPending}` while `useDeferredValue` is catching up — mirrors the `opacity-50` visual hint for screen readers |
 | `role="status"` | An empty-state paragraph uses `role="status"` to announce "No todos match…" or "No todos yet" as a polite live region — screen readers are notified without interrupting the current announcement; the element is suppressed while `isPending` to avoid announcing before the deferred filter settles |
+| `<aside>` + `aria-labelledby` | The debug toolbar is an `<aside>` (complementary landmark) — screen reader users can navigate to it by landmark type; `aria-labelledby` links it to the visible "Debug" title rather than duplicating the name in a separate `aria-label` string |
+| `role="group"` | The delay preset buttons are wrapped in `role="group"` with `aria-labelledby` pointing to the visible "Delay:" label — preferred over `<fieldset>`/`<legend>` for action button groups since fieldset carries default browser styles and is semantically for form controls |
 
 ## Todos 😉
 
