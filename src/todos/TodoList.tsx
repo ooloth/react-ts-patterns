@@ -59,8 +59,24 @@ export function TodoList({ todosPromise, onMutate }: Props) {
   }
 
   const handleDelete = (id: TodoId) => {
+    // Compute the focus target before the optimistic removal changes the list.
+    // flushSync would let us render then focus immediately, but it can't be
+    // used inside startTransition — setTimeout(fn, 0) defers until after commit.
+    // getElementById is used instead of a ref map because the checkboxes already
+    // carry stable IDs for the htmlFor/label association — reuse beats a parallel
+    // data structure. A ref map would be the right call if those IDs didn't exist.
+    const idx = visible.findIndex((t) => t.id === id)
+    const nextFocusId = visible[idx + 1]?.id ?? visible[idx - 1]?.id ?? null
+
     startTransition(async () => {
       addOptimistic({ type: 'delete', id })
+      setTimeout(() => {
+        if (nextFocusId) {
+          document.getElementById(`todo-${nextFocusId}`)?.focus()
+        } else {
+          inputRef.current?.focus()
+        }
+      }, 0)
       toast.loading('Deleting…', { id: 'todo-delete' })
       try {
         await deleteTodo(id, mutationOptions)
