@@ -22,9 +22,9 @@ export function DebugToolbar() {
     // "Debug" title rather than duplicating the name in an aria-label string.
     <aside
       aria-labelledby={titleId}
-      className="fixed bottom-0 inset-x-0 border-t border-gray-200 bg-gray-50 px-4 py-2 flex items-center justify-center gap-6 text-xs text-gray-500"
+      className="fixed inset-x-0 bottom-0 flex items-center justify-center gap-6 border-t border-line bg-surface px-4 py-2 text-xs text-muted"
     >
-      <span id={titleId} className="font-medium text-gray-400 uppercase tracking-wide">Debug</span>
+      <span id={titleId} className="font-medium uppercase tracking-wide text-faint">Debug</span>
       {/* role="group" + aria-labelledby is preferred over <fieldset>/<legend> here:
           these are action buttons (not form controls), and <fieldset> carries default
           browser styles that require resetting. */}
@@ -35,18 +35,18 @@ export function DebugToolbar() {
             key={preset}
             onClick={() => setDelayPreset(preset)}
             aria-pressed={delayPreset === preset}
-            className={`rounded px-2 py-0.5 ${delayPreset === preset ? 'bg-blue-100 text-blue-700 font-medium' : 'hover:bg-gray-200'}`}
+            className={`rounded px-2 py-0.5 transition-colors ${delayPreset === preset ? 'bg-surface-hover font-medium text-accent' : 'hover:bg-surface-hover hover:text-text'}`}
           >
             {PRESET_LABELS[preset]}
           </button>
         ))}
       </div>
-      <label className="flex items-center gap-1.5 cursor-pointer">
+      <label className="flex cursor-pointer items-center gap-1.5">
         <input
           type="checkbox"
           checked={failNext}
           onChange={(e) => setFailNext(e.target.checked)}
-          className="h-3 w-3"
+          className="h-3 w-3 accent-accent"
         />
         Fail next request
       </label>

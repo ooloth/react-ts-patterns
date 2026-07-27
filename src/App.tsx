@@ -24,22 +24,23 @@ export default function App() {
   return (
     <DebugContext value={{ delayPreset, failNext, setDelayPreset, setFailNext }}>
       <main className="mx-auto max-w-xl p-8 pb-16">
-        <h1 className="text-2xl font-semibold">Todos</h1>
-        <p>Playground for trying out modern React and TypeScript idioms.</p>
+        <h1 className="text-xl font-semibold text-text">Todos</h1>
+        <p className="mt-1 text-sm text-muted">Playground for trying out modern React and TypeScript idioms.</p>
         <ErrorBoundary
           fallbackRender={({ error }) => (
-            <p role="alert" className="mt-4 text-red-600">
+            <p role="alert" className="mt-4 text-danger">
               Failed to load todos: {error instanceof Error ? error.message : String(error)}
             </p>
           )}
         >
-          <Suspense fallback={<p className="mt-4 text-gray-400">Loading…</p>}>
+          <Suspense fallback={<p className="mt-4 text-sm text-muted">Loading…</p>}>
             <TodoList todosPromise={todosPromise} onMutate={refresh} />
           </Suspense>
         </ErrorBoundary>
       </main>
       <DebugToolbar />
       <Toaster
+        theme="dark"
         position="bottom-right"
         toastOptions={{
           style: {

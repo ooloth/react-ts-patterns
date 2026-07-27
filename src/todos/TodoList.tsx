@@ -98,34 +98,46 @@ export function TodoList({ todosPromise, onMutate }: Props) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Filter todos…"
-        className="mt-6 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+        className="mt-6 w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
       />
       <AddTodoForm ref={inputRef} onAdd={handleAdd} onMutate={onMutate} />
       {visible.length === 0 && !isPending && (
-        <p role="status" className="mt-4 text-sm text-gray-400">
+        <p role="status" className="mt-4 text-sm text-muted">
           {query.trim() ? `No todos match "${deferredQuery}"` : 'No todos yet'}
         </p>
       )}
-      <ul aria-busy={isPending} className={`mt-4 divide-y divide-gray-200 ${isPending ? 'opacity-50' : ''}`}>
+      <ul aria-busy={isPending} className={`mt-4 divide-y divide-line ${isPending ? 'opacity-50' : ''}`}>
         {visible.map((todo) => (
           <li key={todo.id} className="flex items-center gap-3 py-3">
-            <input
-              id={`todo-${todo.id}`}
-              type="checkbox"
-              checked={todo.status === 'completed'}
-              onChange={() => handleToggle(todo.id)}
-              className="h-4 w-4 cursor-pointer"
-            />
+            <div className="relative h-[1.125rem] w-[1.125rem] flex-shrink-0">
+              <input
+                id={`todo-${todo.id}`}
+                type="checkbox"
+                checked={todo.status === 'completed'}
+                onChange={() => handleToggle(todo.id)}
+                className="peer absolute inset-0 h-full w-full cursor-pointer opacity-0"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none flex h-full w-full items-center justify-center rounded border-2 border-line bg-surface transition-colors duration-150 peer-checked:border-accent peer-checked:bg-accent peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-focus-visible:ring-offset-1 peer-focus-visible:ring-offset-canvas"
+              >
+                {todo.status === 'completed' && (
+                  <svg aria-hidden="true" className="h-2.5 w-2.5 text-white" viewBox="0 0 10 8" fill="none">
+                    <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </div>
+            </div>
             <label
               htmlFor={`todo-${todo.id}`}
-              className={`flex-1 cursor-pointer ${todo.status === 'completed' ? 'line-through text-gray-400' : ''}`}
+              className={`flex-1 cursor-pointer text-sm transition-colors duration-150 ${todo.status === 'completed' ? 'text-faint line-through' : 'text-text'}`}
             >
               {todo.title}
             </label>
             <button
               onClick={() => handleDelete(todo.id)}
               aria-label={`Delete ${todo.title}`}
-              className="text-sm text-red-500 hover:text-red-700"
+              className="text-sm text-muted transition-colors hover:text-danger"
             >
               Delete
             </button>

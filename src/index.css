@@ -1,1 +1,23 @@
 @import 'tailwindcss';
+
+@theme {
+  --color-canvas: #131316;
+  --color-surface: #1d1d21;
+  --color-surface-hover: #26262c;
+  --color-line: #2c2c32;
+  --color-text: #e2e2e8;
+  --color-muted: #5c5c67;
+  --color-faint: #38383f;
+  --color-accent: #6a7fe8;
+  --color-danger: #e5484d;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-text);
+  }
+}

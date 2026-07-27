@@ -24,7 +24,7 @@ function SubmitButton({ label, disabled = false }: { label: string; disabled?: b
     <button
       type="submit"
       disabled={pending || disabled}
-      className="rounded bg-blue-600 px-4 py-2 text-sm text-white disabled:opacity-50"
+      className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-40"
     >
       {label}
     </button>
@@ -71,7 +71,7 @@ export function AddTodoForm({ ref, onAdd, onMutate }: Props) {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="New todo…"
-        className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm"
+        className="flex-1 rounded-md border border-line bg-surface px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
       />
       <SubmitButton label="Add" disabled={title.trim() === ''} />
     </form>

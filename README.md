@@ -126,23 +126,32 @@ details, and tends to duplicate what the other two layers already cover.
 
 ## Accessibility
 
-| Pattern | How used |
-| ------- | -------- |
-| `<label htmlFor>` | Each todo's title is a `<label>` linked to its checkbox via `htmlFor={`todo-${todo.id}`}` — clicking the title activates the checkbox; the ID is data-derived (from `todo.id`), contrasting with `useId` which generates instance-derived IDs |
-| `aria-label` | Delete buttons use `aria-label={`Delete ${todo.title}`}` — visible text stays "Delete" while screen readers announce the item context ("Delete Buy milk") |
-| Focus management | After a todo is deleted, focus moves to the next item's checkbox (or the previous if it was last, or the add input if the list empties) — prevents focus dropping to `<body>` and losing the keyboard user's place |
-| `role="alert"` | The error boundary fallback carries `role="alert"` — screen readers announce it immediately when it appears, without requiring the user to navigate to it |
-| `aria-pressed` | The delay preset buttons in the debug toolbar use `aria-pressed={delayPreset === preset}` — the active selection is communicated to screen readers, not just visually highlighted |
-| `aria-busy` | The todo list sets `aria-busy={isPending}` while `useDeferredValue` is catching up — mirrors the `opacity-50` visual hint for screen readers |
-| `role="status"` | An empty-state paragraph uses `role="status"` to announce "No todos match…" or "No todos yet" as a polite live region — screen readers are notified without interrupting the current announcement; the element is suppressed while `isPending` to avoid announcing before the deferred filter settles |
-| `<aside>` + `aria-labelledby` | The debug toolbar is an `<aside>` (complementary landmark) — screen reader users can navigate to it by landmark type; `aria-labelledby` links it to the visible "Debug" title rather than duplicating the name in a separate `aria-label` string |
-| `role="group"` | The delay preset buttons are wrapped in `role="group"` with `aria-labelledby` pointing to the visible "Delay:" label — preferred over `<fieldset>`/`<legend>` for action button groups since fieldset carries default browser styles and is semantically for form controls |
+| Pattern                       | How used                                                                                                                                                                                                                                                                                              |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<label htmlFor>`             | Each todo's title is a `<label>` linked to its checkbox via `htmlFor={`todo-${todo.id}`}` — clicking the title activates the checkbox; the ID is data-derived (from `todo.id`), contrasting with `useId` which generates instance-derived IDs                                                         |
+| `aria-label`                  | Delete buttons use `aria-label={`Delete ${todo.title}`}` — visible text stays "Delete" while screen readers announce the item context ("Delete Buy milk")                                                                                                                                             |
+| Focus management              | After a todo is deleted, focus moves to the next item's checkbox (or the previous if it was last, or the add input if the list empties) — prevents focus dropping to `<body>` and losing the keyboard user's place                                                                                    |
+| `role="alert"`                | The error boundary fallback carries `role="alert"` — screen readers announce it immediately when it appears, without requiring the user to navigate to it                                                                                                                                             |
+| `aria-pressed`                | The delay preset buttons in the debug toolbar use `aria-pressed={delayPreset === preset}` — the active selection is communicated to screen readers, not just visually highlighted                                                                                                                     |
+| `aria-busy`                   | The todo list sets `aria-busy={isPending}` while `useDeferredValue` is catching up — mirrors the `opacity-50` visual hint for screen readers                                                                                                                                                          |
+| `role="status"`               | An empty-state paragraph uses `role="status"` to announce "No todos match…" or "No todos yet" as a polite live region — screen readers are notified without interrupting the current announcement; the element is suppressed while `isPending` to avoid announcing before the deferred filter settles |
+| `<aside>` + `aria-labelledby` | The debug toolbar is an `<aside>` (complementary landmark) — screen reader users can navigate to it by landmark type; `aria-labelledby` links it to the visible "Debug" title rather than duplicating the name in a separate `aria-label` string                                                      |
+| `role="group"`                | The delay preset buttons are wrapped in `role="group"` with `aria-labelledby` pointing to the visible "Delay:" label — preferred over `<fieldset>`/`<legend>` for action button groups since fieldset carries default browser styles and is semantically for form controls                            |
 
 ## Todos 😉
 
-- [ ] Improve styling
 - [ ] Optimize a11y (e.g. screen reader users, keyboard users, color contrast, etc)
 - [ ] Optimize UX (e.g. intuitive journeys, optimistic updates, more/fewer animations)
+  - [ ] **Space-to-create (Things 3 style)**: pressing Space (or a dedicated shortcut) inserts an
+        inline creation row directly in the list, pre-focused on the title field — avoids the
+        form-above-list feel and keeps the user's eyes on the list while adding
+  - [ ] **Alphanumeric-key-to-filter (Things 3 style)**: pressing any letter or number reveals a
+        floating search input and its floating results list and inserts the character in it — avoids
+        the same form-above-list issue and supports discovering results outside the current view
+  - [ ] **Floating pill debug toolbar**: collapse the full-width debug bar into a small floating pill
+        (corner-anchored) that expands on hover or click — keeps the tool accessible without
+        visually anchoring a dev-only bar to the bottom of every screen
+  - [ ] **Keyboard shortcuts**: for everything
 - [ ] Express code boundaries more effectively via folder/file organization
 - [ ] Move all `(state, action) → newState` reducers into `domain/` and unit-test them there —
       `applyOptimistic` already follows this shape; the rest of the mutation logic could too
