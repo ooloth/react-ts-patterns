@@ -134,6 +134,7 @@ details, and tends to duplicate what the other two layers already cover.
 | `role="alert"` | The error boundary fallback carries `role="alert"` — screen readers announce it immediately when it appears, without requiring the user to navigate to it |
 | `aria-pressed` | The delay preset buttons in the debug toolbar use `aria-pressed={delayPreset === preset}` — the active selection is communicated to screen readers, not just visually highlighted |
 | `aria-busy` | The todo list sets `aria-busy={isPending}` while `useDeferredValue` is catching up — mirrors the `opacity-50` visual hint for screen readers |
+| `role="status"` | An empty-state paragraph uses `role="status"` to announce "No todos match…" or "No todos yet" as a polite live region — screen readers are notified without interrupting the current announcement; the element is suppressed while `isPending` to avoid announcing before the deferred filter settles |
 
 ## Todos 😉
 
