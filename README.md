@@ -1,4 +1,4 @@
-# React 19 + TypeScript playground
+# React + TypeScript Patterns
 
 A todo app (load, add, toggle, delete — with simulated async latency) built as a playground for
 demonstrating modern React 19, TypeScript and UX patterns, where UX includes accessibility, styling,

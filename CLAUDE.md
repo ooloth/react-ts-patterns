@@ -1,4 +1,4 @@
-# Todo
+# react-ts-patterns
 
 A todo app implementation in React 19 + TypeScript 7 intended to act as a playground for learning
 and demonstrating modern React, TS and UX best practices.
