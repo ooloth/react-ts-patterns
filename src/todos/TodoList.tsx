@@ -1,4 +1,12 @@
-import { startTransition, use, useDeferredValue, useId, useOptimistic, useRef, useState } from 'react'
+import {
+  startTransition,
+  use,
+  useDeferredValue,
+  useId,
+  useOptimistic,
+  useRef,
+  useState,
+} from 'react'
 import { toast } from 'sonner'
 import { deleteTodo, toggleTodo } from './store'
 import type { TodosPromise } from './store'
@@ -18,15 +26,19 @@ export function TodoList({ todosPromise, onMutate }: Props) {
   const todos: Todo[] = use(todosPromise).map(parseTodo)
   const [optimisticTodos, addOptimistic] = useOptimistic(todos, applyOptimistic)
   const { mutationOptions, setFailNext } = useMutationOptions()
+
   const inputRef = useRef<HTMLInputElement>(null)
   const toggleControllerRef = useRef<AbortController | null>(null)
+
   // useId: stable unique ID per instance — correct when the component is reused or SSR'd.
   const filterId = useId()
   const [query, setQuery] = useState('')
+
   // useDeferredValue keeps the input responsive by letting React deprioritize
   // the filtered-list re-render when it can't keep up with fast typing.
   const deferredQuery = useDeferredValue(query)
   const isPending = query !== deferredQuery
+
   // React Compiler: no useMemo — derived values like this are memoized automatically.
   const visible = filterTodos(optimisticTodos, deferredQuery)
 
@@ -91,7 +103,9 @@ export function TodoList({ todosPromise, onMutate }: Props) {
 
   return (
     <>
-      <label htmlFor={filterId} className="sr-only">Filter todos</label>
+      <label htmlFor={filterId} className="sr-only">
+        Filter todos
+      </label>
       <input
         id={filterId}
         type="search"
@@ -100,13 +114,19 @@ export function TodoList({ todosPromise, onMutate }: Props) {
         placeholder="Filter todos…"
         className="mt-6 w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
       />
+
       <AddTodoForm ref={inputRef} onAdd={handleAdd} onMutate={onMutate} />
+
       {visible.length === 0 && !isPending && (
         <p role="status" className="mt-4 text-sm text-muted">
           {query.trim() ? `No todos match "${deferredQuery}"` : 'No todos yet'}
         </p>
       )}
-      <ul aria-busy={isPending} className={`mt-4 divide-y divide-line ${isPending ? 'opacity-50' : ''}`}>
+
+      <ul
+        aria-busy={isPending}
+        className={`mt-4 divide-y divide-line ${isPending ? 'opacity-50' : ''}`}
+      >
         {visible.map((todo) => (
           <li key={todo.id} className="flex items-center gap-3 py-3">
             <div className="relative h-[1.125rem] w-[1.125rem] flex-shrink-0">
@@ -122,12 +142,24 @@ export function TodoList({ todosPromise, onMutate }: Props) {
                 className="pointer-events-none flex h-full w-full items-center justify-center rounded border-2 border-line bg-surface transition-colors duration-150 peer-checked:border-accent peer-checked:bg-accent peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-focus-visible:ring-offset-1 peer-focus-visible:ring-offset-canvas"
               >
                 {todo.status === 'completed' && (
-                  <svg aria-hidden="true" className="h-2.5 w-2.5 text-white" viewBox="0 0 10 8" fill="none">
-                    <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg
+                    aria-hidden="true"
+                    className="h-2.5 w-2.5 text-white"
+                    viewBox="0 0 10 8"
+                    fill="none"
+                  >
+                    <path
+                      d="M1 4L3.5 6.5L9 1"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 )}
               </div>
             </div>
+
             <label
               htmlFor={`todo-${todo.id}`}
               className={`flex-1 cursor-pointer text-sm transition-colors duration-150 ${todo.status === 'completed' ? 'text-faint line-through' : 'text-text'}`}
